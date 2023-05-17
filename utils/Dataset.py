@@ -96,11 +96,21 @@ class ModalDataset(Dataset):
 
     def __len__(self) -> int:
         if self.mode == 'train':
-            return
-        return self.num_img
+            with open(self.train_imgs_file, 'r') as f:
+                curr = f.readlines()
+            return len(curr)
+        if self.mode == 'test':
+            with open(self.test_imgs_file, 'r') as f:
+                curr = f.readlines()
+            return len(curr)
+        if self.mode == 'unlabelled':
+            with open(self.unlab_train_img, 'r') as f:
+                curr = f.readlines()
+            return len(curr)
 
     def __getitem__(self, idx) -> dict:
         if torch.is_tensor(idx):
             idx = idx.tolist()
+        #check for train
 
         return 0
