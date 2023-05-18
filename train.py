@@ -147,7 +147,7 @@ def train():
         for epoch in range(1, args.epochs + 1):
             model.train()
 
-            for batch_i, (_, imgs, target) in enumerate(tqdm.tqdm(train_dataloader, desc=f"Training Epoch {epoch}")):
+            for batch_i, (imgs, target) in enumerate(tqdm.tqdm(train_dataloader, desc=f"Training Epoch {epoch}")):
 
                 imgs = Variable(imgs.to(device, non_blocking=True))
 

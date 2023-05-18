@@ -59,7 +59,7 @@ def data_augmentation_normalization_resize(x: torch.Tensor, target: List = [], r
     #     aug_data += [x[i]]
 
     img = x.clone()
-
+    aug_data += [img]
     if rotation:
         rot_imgs = [T.RandomRotation(degrees=angle)(img) for angle in
                     range(360 // num_rotation, 360, 360 // num_rotation)]
