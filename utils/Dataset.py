@@ -116,14 +116,10 @@ class ModalDataset(Dataset):
                         f.write(imgs_val[i])
 
     def get_image(self, img_path: str, labels_dict: dict = {}):
-        print(img_path)
-        print(img_path.rstrip('\n'))
 
         img = read_image(img_path.rstrip('\n'))
 
         curr = img_path.replace(self.path + '/', '').rstrip('\n').split('/')
-
-        print(curr)
 
         if len(curr) == 3:
             return img, labels_dict[curr[1]]
@@ -165,9 +161,8 @@ class ModalDataset(Dataset):
         if self.mode == 'train' or self.mode == 'train_cross_validation':
             with open(self.path + '/' + self.file_name, 'r') as f:
                 curr_imgs = f.readlines()
-            print("__get__", curr_imgs[idx])
             img, target = self.get_image(curr_imgs[idx], self.labels_dict)
-            img = T.Resize(self.img_size)(img)
+            img = T.Resize(self.img_size, antialias=None)(img)
             # print(data_augmentation_normalization_resize(img))
             aug_imgs = torch.stack(data_augmentation_normalization_resize(img))
             aug_imgs = torch.cat((aug_imgs, add_random_blocks(aug_imgs)))
