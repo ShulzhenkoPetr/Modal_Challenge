@@ -87,18 +87,18 @@ class ModalDataset(Dataset):
                         f.write(img[i] + '\n')
 
         os.chdir('..')
-    #
-    # def get_image(self, img_path: str, labels_dict: dict = {}):
-    #
-    #     img = read_image(img_path.rstrip('\n'))
-    #
-    #     curr = img_path.replace(self.path + '/', '').rstrip('\n').split('/')
-    #
-    #     if len(curr) == 3:
-    #         return img, labels_dict[curr[1]]
-    #
-    #     else:
-    #         return img
+
+    def get_image(self, img_path: str, labels_dict: dict = {}):
+
+        img = read_image(img_path.rstrip('\n'))
+
+        curr = img_path.replace(self.path + '/', '').rstrip('\n').split('/')
+
+        if len(curr) == 3:
+            return img, labels_dict[curr[1]]
+
+        else:
+            return img
 
     # def get_labels_dict(self, path: str) -> dict:
     #
@@ -120,15 +120,12 @@ class ModalDataset(Dataset):
         self.mode = mode
         self.file_name = mode + '_imgs.txt'
 
-        print(os.getcwd())
         with open(path + '/labels_dict.json', 'r') as f:
             self.labels_dict = json.load(f)
 
-        #self.create_img_txt(path, mode, indexes=indexes)
+        self.create_img_txt(path, mode, indexes=indexes)
 
     def __len__(self) -> int:
-        print(self.path)
-        print(os.getcwd())
         with open(self.path + '/' + self.file_name, 'r') as f:
             return len(f.readlines())
 
