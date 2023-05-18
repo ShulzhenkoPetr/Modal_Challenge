@@ -1,0 +1,150 @@
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/gosling/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/hammer/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/carbine/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/zinfandel/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/peahen/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/Conestoga wagon/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/squash racket/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/bat/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/cupola/000003.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000008.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000009.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000007.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000013.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000012.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000006.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000010.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000004.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000005.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000011.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000001.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000000.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000014.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000002.jpg
+../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/train/tragopan/000003.jpg

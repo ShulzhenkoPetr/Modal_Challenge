@@ -5,8 +5,9 @@ from torchvision.utils import make_grid
 from torchvision.io import read_image
 import torchvision.transforms as T
 import numpy as np
-from Preprocessing import data_augmentation_normalization_resize, add_random_blocks
+from utils.Preprocessing import data_augmentation_normalization_resize, add_random_blocks
 import os
+import json
 import matplotlib.pyplot as plt
 
 
@@ -99,16 +100,18 @@ class ModalDataset(Dataset):
         else:
             return img
 
-    def get_labels_dict(self, path: str) -> dict:
-
-        os.chdir(path)
-
-        labels = os.listdir()
-        labels_dict = {}
-        for i in range(len(labels)):
-            labels_dict.update({labels[i]: i})
-        os.chdir('..')
-        return labels_dict
+    # def get_labels_dict(self, path: str) -> dict:
+    #
+    #     print(os.getcwd())
+    #
+    #     os.chdir(path)
+    #
+    #     labels = os.listdir()
+    #     labels_dict = {}
+    #     for i in range(len(labels)):
+    #         labels_dict.update({labels[i]: i})
+    #     os.chdir('..')
+    #     return labels_dict
 
     def __init__(self, mode: str, path: str, indexes: list = [], img_size: tuple = (224, 224)) -> None:
 
@@ -116,8 +119,12 @@ class ModalDataset(Dataset):
         self.path = path
         self.mode = mode
         self.file_name = mode + '_imgs.txt'
-        self.labels_dict = self.get_labels_dict(path + '/train')
-        self.create_img_txt(path, mode, indexes=indexes)
+
+        print(os.getcwd())
+        with open('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/labels_dict.json', 'r') as f:
+            self.labels_dict = json.load(f)
+
+        #self.create_img_txt(path, mode, indexes=indexes)
 
     def __len__(self) -> int:
         with open(self.path + '/' + self.file_name, 'r') as f:

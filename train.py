@@ -8,7 +8,9 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from torch.autograd import Variable
 
-from utils.Dataset import Dataset
+from models import ResNetFinetune
+
+from utils.Dataset import ModalDataset
 
 def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_cpu: int):
     """
@@ -21,7 +23,7 @@ def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_c
     :return torch DataLoader
     """
 
-    dataset = Dataset(path, mode)
+    dataset = ModalDataset(path, mode)
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -60,9 +62,9 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
             outputs = model(imgs)
             loss = loss_fn(outputs)
 
-            acc = torch.sum(outputs.argmax(dim=1) == target) / len(target)
+            acc = torch.sum(outputs.detach().cpu().numpy().argmax(dim=1) == target) / len(target)
 
-            losses.append(loss)
+            losses.append(loss.detach().cpu())
             accuracy.append(acc)
 
 
@@ -73,7 +75,9 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
 def train():
     parser = argparse.ArgumentParser(description="Baseline Model training")
     parser.add_argument("-d", "--data", type=str, default="", help="Path to root data folder")
+    parser.add_argument("--nb_classes", type=int, default=48, help="Number of classes")
     parser.add_argument("--k_folds", type=int, default=3, help="Number of folds in cross-validation")
+    parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
     parser.add_argument("--lr", type=int, default=0.001, help="Learning rate")
     parser.add_argument("--decay", type=int, default=0.0005, help="Adam decay")
     parser.add_argument("-e", "--epochs", type=int, default=300, help="Number of epochs")
@@ -106,8 +110,8 @@ def train():
     accuracy = []
 
     #Choose images for each fold of cross validation
-    train_len = len_dataset(args.data + '/train.txt')
-    indices = np.random.choice(train_len, size=(args.k_folds, (1 / args.k_folds) * train_len), replace=False)
+    train_len = len_dataset(args.data + '/train_imgs.txt')
+    indices = np.random.choice(train_len, size=(args.k_folds, int((1 / args.k_folds) * train_len)), replace=False)
 
     val_accuracy = []
     val_loss = []
@@ -129,7 +133,7 @@ def train():
             args.batch_size,
             args.n_cpu)
 
-        model = ''
+        model = ResNetFinetune(args.nb_classes, frozen=True)
 
         params = [p for p in model.parameters() if p.requires_grad]
 
