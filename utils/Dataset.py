@@ -120,7 +120,8 @@ class ModalDataset(Dataset):
         self.mode = mode
         self.file_name = mode + '_imgs.txt'
 
-        with open(path + '/labels_dict.json', 'r') as f:
+        print(os.getcwd())
+        with open('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/labels_dict.json', 'r') as f:
             self.labels_dict = json.load(f)
 
         #self.create_img_txt(path, mode, indexes=indexes)
