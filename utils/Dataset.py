@@ -119,7 +119,7 @@ class ModalDataset(Dataset):
         self.mode = mode
         self.file_name = mode + '_imgs.txt'
         self.labels_dict = self.get_labels_dict(path + '/train')
-        self.create_img_txt(path, mode, indexes=indexes)
+        #self.create_img_txt(path, mode, indexes=indexes)
 
     def __len__(self) -> int:
         with open(self.path + '/' + self.file_name, 'r') as f:
