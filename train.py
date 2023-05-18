@@ -38,7 +38,7 @@ def len_dataset(path: str) -> int:
     with open(path, 'r') as f:
         return len(f.readlines())
 
-
+@torch.no_grad()
 def evaluate(model, val_dataloader: DataLoader) -> tuple:
     """
     Evaluates the model on a val set
@@ -56,14 +56,13 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
     for imgs, target in val_dataloader:
         #imgs = Variable(imgs.to(device, non_blocking=True), requires_grad=False)
 
-        with torch.no_grad():
-            outputs = model(imgs)
-            loss = loss_fn(outputs)
+        outputs = model(imgs)
+        loss = loss_fn(outputs)
 
-            acc = torch.sum(outputs.argmax(dim=1) == target) / len(target)
+        acc = torch.sum(outputs.argmax(dim=1) == target) / len(target)
 
-            losses.append(loss)
-            accuracy.append(acc)
+        losses.append(loss)
+        accuracy.append(acc)
 
 
     return np.mean(losses), np.mean(accuracy)
