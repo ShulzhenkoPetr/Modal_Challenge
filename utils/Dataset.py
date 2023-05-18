@@ -3,10 +3,10 @@ from tqdm import tqdm
 from torch.utils.data import Dataset
 from torchvision.utils import make_grid
 from torchvision.io import read_image
+import torchvision.transforms as T
 import numpy as np
-from Preprocessing import au
+from Preprocessing import data_augmentation_normalization_resize, add_random_blocks
 import os
-from typing import Tuple, List, Dict
 import matplotlib.pyplot as plt
 
 
@@ -23,6 +23,7 @@ class ModalDataset(Dataset):
         os.chdir(path)
         img = []
         if mode == 'train':
+            os.chdir(mode)
             class_list = os.listdir()
             for class_ in tqdm(class_list):
                 if not class_.startswith('.'):
@@ -36,27 +37,32 @@ class ModalDataset(Dataset):
                     f.write(img[i] + '\n')
 
         if mode == 'test':
+            os.chdir(mode)
             images = os.listdir()
             img += images
-            img = [path + '/' + img[i] for i in range(len(img))]
+            img = [path + '/test/' + img[i] for i in range(len(img))]
 
             with open(path + '/test_imgs.txt', 'w') as f:
                 for i in range(len(img)):
                     f.write(img[i] + '\n')
 
         if mode == 'unlabelled':
+            os.chdir(mode)
             images = os.listdir()
             img += images
-            img = [path + '/' + img[i] for i in range(len(img))]
+            img = [path + '/unlabelled/' + img[i] for i in range(len(img))]
 
             with open(path + '/unlabelled_imgs.txt', 'w') as f:
                 for i in range(len(img)):
                     f.write(img[i] + '\n')
 
         if mode == 'train_cross_validation' or mode == 'val_cross_validation':
+            os.chdir('train')
             img_val = []
             class_list = os.listdir()
+            print(class_list)
             for class_ in tqdm(class_list):
+
                 if not class_.startswith('.'):
                     os.chdir(class_)
                     cur = os.listdir()
@@ -81,12 +87,11 @@ class ModalDataset(Dataset):
 
         os.chdir('..')
 
-
-    def get_image(self, img_path: str, labels_dict):
+    def get_image(self, img_path: str, labels_dict: dict = {}):
 
         img = read_image(img_path.rstrip('\n'))
 
-        curr = img_path.replace(self.path + '/').rstrip('\n').split('/')
+        curr = img_path.replace(self.path + '/', '').rstrip('\n').split('/')
 
         if len(curr) == 3:
             return img, labels_dict[curr[1]]
@@ -118,13 +123,18 @@ class ModalDataset(Dataset):
         with open(self.path + '/' + self.file_name, 'r') as f:
             return len(f.readlines())
 
-
     def __getitem__(self, idx) -> dict:
 
         if mode == 'train' or mode == 'train_cross_validation':
             with open(self.path + '/' + self.file_name, 'r') as f:
                 curr_imgs = f.readlines()
             img, target = self.get_image(curr_imgs[idx], self.labels_dict)
+            img = T.Resize(self.img_size)(img)
+            # print(data_augmentation_normalization_resize(img))
+            aug_imgs = torch.stack(data_augmentation_normalization_resize(img))
+            aug_imgs = torch.cat((aug_imgs, add_random_blocks(aug_imgs)))
+            index = np.random.randint(0, len(self.labels_dict))
+            img = aug_imgs[index].to(float) / 255.
             return {'image': img, 'target': target}
 
 
@@ -132,20 +142,22 @@ class ModalDataset(Dataset):
             with open(self.path + '/' + self.file_name, 'r') as f:
                 curr_imgs = f.readlines()
             img, target = self.get_image(curr_imgs[idx], self.labels_dict)
-            return {'image': img, 'target': target}
-
+            img = T.Resize(self.img_size)(img)
+            return {'image': img.to(float) / 255., 'target': target}
 
         if mode == 'test' or mode == 'unlabelled':
             with open(self.path + '/' + self.file_name, 'r') as f:
-                curr_imgs = f.readlines()
-            return {'image': curr_imgs[idx]}
+                img = self.get_image(f.readlines()[idx])
+                img = T.Resize(self.img_size)(img)
+            return {'image': img.to(float) / 255.}
 
 
 if __name__ == '__main__':
     mode = 'train'
+    indexes = [0, 5, 4]
     path = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal'
-    # dataset = ModalDataset(mode, path)
-    a = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal/test/7hHUDQZ86TVerFY.jpg\n'
-    print(a)
-    a.rstrip('\n')
-    print(a)
+    dataset = ModalDataset(mode, path, indexes=indexes)
+    # a = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal/test/7hHUDQZ86TVerFY.jpg\n'
+    print(show_tensor_images(dataset.__getitem__(5)['image'], num_images=1))
+    # a.rstrip('\n')
+    # print(a)

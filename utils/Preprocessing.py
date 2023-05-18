@@ -40,50 +40,54 @@ def get_images(path: str) -> tuple((Dict, List, List)):
     return labels_dict, data, target
 
 
-def data_augmentation_normalization_resize(x: List, target: List, rotation: bool = True, num_rotation: int = 6,
+def data_augmentation_normalization_resize(x: torch.Tensor, target: List = [], rotation: bool = True,
+                                           num_rotation: int = 6,
                                            gaussian_noise: bool = True, noise_factor: float = 0.6, flips: bool = True,
                                            normalization: bool = True, resize: bool = True,
                                            size: tuple = (224, 224)) -> tuple((torch.Tensor, torch.Tensor)):
     aug_data = []
     aug_target = []
 
-    for i in tqdm(range(len(x))):
-        aug_target += [target[i]]
-        img = x[i]
+    # for i in tqdm(range(len(x))):
+    # aug_target += [target[i]]
+    # img = x[i]
 
-        if resize:
-            img = T.Resize(size)(x[i])
-            aug_data += [img]
-        else:
-            aug_data += [x[i]]
+    # if resize:
+    #     img = T.Resize(size)(x[i])
+    #     aug_data += [img]
+    # else:
+    #     aug_data += [x[i]]
 
-        if rotation:
-            rot_imgs = [T.RandomRotation(degrees=angle)(img) for angle in
-                        range(360 // num_rotation, 360, 360 // num_rotation)]
-            rot_target = [target[i] for i in range(len(rot_imgs))]
-            aug_data += rot_imgs
-            aug_target += rot_target
+    img = x.clone()
 
-        if gaussian_noise:
-            noisy = img.to(float) + torch.randn_like(img.to(float)) * noise_factor
+    if rotation:
+        rot_imgs = [T.RandomRotation(degrees=angle)(img) for angle in
+                    range(360 // num_rotation, 360, 360 // num_rotation)]
+        # rot_target = [target[i] for i in range(len(rot_imgs))]
+        aug_data += rot_imgs
+        # aug_target += rot_target
 
-            aug_data += [noisy]
-            aug_target += [target[i]]
+    if gaussian_noise:
+        noisy = img.to(float) + torch.randn_like(img.to(float)) * noise_factor
 
-        if flips:
-            aug_data += [T.RandomHorizontalFlip(p=1)(img)]
-            aug_target += [target[i]]
-            aug_data += [T.RandomVerticalFlip(p=1)(img)]
-            aug_target += [target[i]]
+        aug_data += [noisy]
+        # aug_target += [target[i]]
 
-    if normalization:
-        aug_data = torch.stack(aug_data).to(float)
-        mean = aug_data.mean(dim=(0, 2, 3))
-        std = aug_data.std(dim=(0, 2, 3))
-        aug_data = T.Normalize(mean, std)(aug_data)
+    if flips:
+        aug_data += [T.RandomHorizontalFlip(p=1)(img)]
+        # aug_target += [target[i]]
+        aug_data += [T.RandomVerticalFlip(p=1)(img)]
+        # aug_target += [target[i]]
 
-    return aug_data, torch.Tensor(aug_target)
 
+    return aug_data
+
+def normalize(x: list) -> torch.Tensor:
+    aug_data = torch.stack(x).to(float)
+    mean = aug_data.mean(dim=(0, 2, 3))
+    std = aug_data.std(dim=(0, 2, 3))
+    aug_data = T.Normalize(mean, std)(aug_data)
+    return aug_data
 
 def add_random_blocks(img: torch.Tensor, n_k: int = 10, size=32) -> torch.Tensor:
     h, w = size, size
