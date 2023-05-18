@@ -72,7 +72,7 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
 
 def train():
     parser = argparse.ArgumentParser(description="Baseline Model training")
-    parser.add_argument("-d", "--data", type=str, default="", help="Path to data")
+    parser.add_argument("-d", "--data", type=str, default="", help="Path to root data folder")
     parser.add_argument("--k_folds", type=int, default=3, help="Number of folds in cross-validation")
     parser.add_argument("--lr", type=int, default=0.001, help="Learning rate")
     parser.add_argument("--decay", type=int, default=0.0005, help="Adam decay")
