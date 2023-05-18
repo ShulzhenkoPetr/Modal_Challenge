@@ -168,20 +168,20 @@ class ModalDataset(Dataset):
             aug_imgs = torch.cat((aug_imgs, add_random_blocks(aug_imgs)))
             index = np.random.randint(0, 18)
             img = aug_imgs[index].to(float) / 255.
-            return {'image': img, 'target': target}
+            return (img, target)
 
         if self.mode == 'val_cross_validation':
             with open(self.path + '/' + self.file_name, 'r') as f:
                 curr_imgs = f.readlines()
             img, target = self.get_image(curr_imgs[idx], self.labels_dict)
             img = T.Resize(self.img_size)(img)
-            return {'image': img.to(float) / 255., 'target': target}
+            return (img.to(float) / 255., target)
 
         if self.mode == 'test' or self.mode == 'unlabelled':
             with open(self.path + '/' + self.file_name, 'r') as f:
                 img = self.get_image(f.readlines()[idx])
                 img = T.Resize(self.img_size)(img)
-            return {'image': img.to(float) / 255.}
+            return (img.to(float) / 255.)
 
 
 if __name__ == '__main__':

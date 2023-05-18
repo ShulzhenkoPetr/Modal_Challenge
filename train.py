@@ -1,6 +1,7 @@
 import os
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 import tqdm
 
 import torch
@@ -11,6 +12,7 @@ from torch.autograd import Variable
 from models import ResNetFinetune
 
 from utils.Dataset import ModalDataset
+
 
 def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_cpu: int):
     """
@@ -30,6 +32,7 @@ def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_c
         shuffle=True,
         num_workers=n_cpu)
     return dataloader
+
 
 def len_dataset(path: str) -> int:
     """
@@ -56,7 +59,7 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
     loss_fn = torch.nn.CrossEntropyLoss()
 
     for imgs, target in val_dataloader:
-        #imgs = Variable(imgs.to(device, non_blocking=True), requires_grad=False)
+        # imgs = Variable(imgs.to(device, non_blocking=True), requires_grad=False)
 
         with torch.no_grad():
             outputs = model(imgs)
@@ -67,9 +70,7 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
             losses.append(loss.detach().cpu())
             accuracy.append(acc)
 
-
     return np.mean(losses), np.mean(accuracy)
-
 
 
 def train():
@@ -86,9 +87,9 @@ def train():
                         help="Path to checkpoint file (.weights or .pth). Starts training from checkpoint model")
     parser.add_argument("--checkpoint_interval", type=int, default=1,
                         help="Interval of epochs between saving model weights")
-    parser.add_argument("--checkpoint_dir", type=str, default="checkpoints",
+    parser.add_argument("--checkpoint_dir", type=str, default="../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/Checkpoints",
                         help="Directory in which the checkpoints are stored")
-    parser.add_argument("--evaluation_interval", type=int, default=1,
+    parser.add_argument("--evaluation_interval", type=int, default=5,
                         help="Interval of epochs between evaluations on validation set")
     parser.add_argument("--softmax_thres", type=float, default=0.5,
                         help="Threshold for softmax confidence before adding a label to an unlabeled image")
@@ -105,11 +106,11 @@ def train():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    #Lists accumulating cross validation metrics
+    # Lists accumulating cross validation metrics
     losses = []
     accuracy = []
 
-    #Choose images for each fold of cross validation
+    # Choose images for each fold of cross validation
     train_len = len_dataset(args.data + '/train_imgs.txt')
     indices = np.random.choice(train_len, size=(args.k_folds, int((1 / args.k_folds) * train_len)), replace=False)
 
@@ -133,36 +134,48 @@ def train():
             args.batch_size,
             args.n_cpu)
 
-        model = ResNetFinetune(args.nb_classes, frozen=True)
+        model = ResNetFinetune(args.nb_classes, frozen=True).to(device)
 
         params = [p for p in model.parameters() if p.requires_grad]
 
         optimizer = optim.Adam(
             params,
-            lr = args.lr,
-            weight_decay = args.decay)
+            lr=args.lr,
+            weight_decay=args.decay)
 
         loss_fn = torch.nn.CrossEntropyLoss()
+
+        train_loss_list = []
+        train_acc_list = []
+        train_loss_list_local = []
+        train_acc_list_local = []
 
         for epoch in range(1, args.epochs + 1):
             model.train()
 
             for batch_i, (imgs, target) in enumerate(tqdm.tqdm(train_dataloader, desc=f"Training Epoch {epoch}")):
-
-                imgs = Variable(imgs.to(device, non_blocking=True))
+                imgs = Variable(imgs.to(device, dtype=torch.float, non_blocking=True))
 
                 outputs = model(imgs)
-                loss = loss_fn(outputs)
+                loss = loss_fn(outputs, target.to(device))
                 loss.backward()
 
-                #change lr ... ? maybe scheduler
+                train_loss_list_local.append(loss)
+                train_acc_list_local.append(
+                    torch.sum(outputs.detach().cpu().numpy().argmax(dim=1) == target) / len(target)
+                )
+
+                # change lr ... ? maybe scheduler
 
                 optimizer.step()
                 optimizer.zero_grad()
 
-                #logging ?
+            #Naive Logging
+            if epoch % args.evaluation_interval == 0:
+                train_loss_list.append(np.array(train_loss_list_local).mean())
+                train_acc_list.append(np.array(train_acc_list_local).mean())
 
-            #Evaluate
+            # Evaluate
             if epoch == args.epochs:
                 print("\n---- Evaluating Model ----")
                 # Evaluate the model on the validation set
@@ -170,10 +183,22 @@ def train():
                     model,
                     val_dataloader
                 )
+                print(metrics_output)
                 val_loss[i_fold] = metrics_output[0]
                 val_accuracy[i_fold] = metrics_output[1]
 
+                #Save the model
+                checkpoint_path = os.path.join(args.checkpoint_dir, f"resnet_fold{i_fold}.pth")
+                print(f"---- Saving checkpoint to: '{checkpoint_path}' ----")
+                torch.save(model.state_dict(), checkpoint_path)
 
+                #Display graphs
+                plt.plot(np.arange(1, args.epochs, args.evaluation_interval), train_loss_list, label='loss')
+                plt.plot(np.arange(1, args.epochs, args.evaluation_interval), train_acc_list, label='accuracy')
+
+
+    print(val_accuracy)
+    print(val_loss)
 
 
 if __name__ == '__main__':
