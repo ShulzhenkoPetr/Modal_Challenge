@@ -12,7 +12,7 @@ from models import ResNetFinetune
 
 from utils.Dataset import ModalDataset
 
-def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_cpu: int):
+def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_cpu: int):
     """
     Creates a train data loader
     :param path: path to images
@@ -23,7 +23,7 @@ def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_c
     :return torch DataLoader
     """
 
-    dataset = ModalDataset(path, mode)
+    dataset = ModalDataset(mode, path, indexes=indices)
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -121,14 +121,14 @@ def train():
         print(f"\n---- Training Model {i_fold} out of {args.k_folds}----")
 
         train_dataloader = create_data_loader(
+            'train_cross_validation',
             args.data,
-            'train',
             indices[i_fold],
             args.batch_size,
             args.n_cpu)
         val_dataloader = create_data_loader(
+            'val_cross_validation',
             args.data,
-            'val',
             indices[i_fold],
             args.batch_size,
             args.n_cpu)
@@ -147,7 +147,7 @@ def train():
         for epoch in range(1, args.epochs + 1):
             model.train()
 
-            for batch_i, (_, imgs, target) in enumerate(tqdm.tqdm(train_dataloader, desc=f"Training Epoch {epoch}")):
+            for batch_i, (imgs, target) in enumerate(tqdm.tqdm(train_dataloader, desc=f"Training Epoch {epoch}")):
 
                 imgs = Variable(imgs.to(device, non_blocking=True))
 
