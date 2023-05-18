@@ -12,7 +12,7 @@ from models import ResNetFinetune
 
 from utils.Dataset import ModalDataset
 
-def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_cpu: int):
+def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_cpu: int):
     """
     Creates a train data loader
     :param path: path to images
@@ -23,7 +23,7 @@ def create_data_loader(path: str, mode: str, indices: list, batch_size: int, n_c
     :return torch DataLoader
     """
 
-    dataset = ModalDataset(path, mode)
+    dataset = ModalDataset(mode, path)
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
