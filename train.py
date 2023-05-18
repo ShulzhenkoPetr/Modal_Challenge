@@ -23,7 +23,7 @@ def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_c
     :return torch DataLoader
     """
 
-    dataset = ModalDataset(mode, path)
+    dataset = ModalDataset(mode, path, indexes=indices)
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -121,14 +121,14 @@ def train():
         print(f"\n---- Training Model {i_fold} out of {args.k_folds}----")
 
         train_dataloader = create_data_loader(
+            'train_cross_validation',
             args.data,
-            'train',
             indices[i_fold],
             args.batch_size,
             args.n_cpu)
         val_dataloader = create_data_loader(
+            'val_cross_validation',
             args.data,
-            'val',
             indices[i_fold],
             args.batch_size,
             args.n_cpu)

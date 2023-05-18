@@ -19,74 +19,74 @@ def show_tensor_images(image_tensor: torch.Tensor, num_images: int = 25, size: t
 
 
 class ModalDataset(Dataset):
-    # @staticmethod
-    # def create_img_txt(path: str, mode: str, indexes: list = []) -> None:
-    #     os.chdir(path)
-    #     img = []
-    #     if mode == 'train':
-    #         os.chdir(mode)
-    #         class_list = os.listdir()
-    #         for class_ in tqdm(class_list):
-    #             if not class_.startswith('.'):
-    #                 os.chdir(class_)
-    #                 cur = os.listdir()
-    #                 img += [path + '/train/' + class_ + '/' + cur[i] for i in range(len(cur))]
-    #                 os.chdir('..')
-    #
-    #         with open(path + '/train_imgs.txt', 'w') as f:
-    #             for i in range(len(img)):
-    #                 f.write(img[i] + '\n')
-    #
-    #     if mode == 'test':
-    #         os.chdir(mode)
-    #         images = os.listdir()
-    #         img += images
-    #         img = [path + '/test/' + img[i] for i in range(len(img))]
-    #
-    #         with open(path + '/test_imgs.txt', 'w') as f:
-    #             for i in range(len(img)):
-    #                 f.write(img[i] + '\n')
-    #
-    #     if mode == 'unlabelled':
-    #         os.chdir(mode)
-    #         images = os.listdir()
-    #         img += images
-    #         img = [path + '/unlabelled/' + img[i] for i in range(len(img))]
-    #
-    #         with open(path + '/unlabelled_imgs.txt', 'w') as f:
-    #             for i in range(len(img)):
-    #                 f.write(img[i] + '\n')
-    #
-    #     if mode == 'train_cross_validation' or mode == 'val_cross_validation':
-    #         os.chdir('train')
-    #         img_val = []
-    #         class_list = os.listdir()
-    #         print(class_list)
-    #         for class_ in tqdm(class_list):
-    #
-    #             if not class_.startswith('.'):
-    #                 os.chdir(class_)
-    #                 cur = os.listdir()
-    #                 img += [path + '/train/' + class_ + '/' + cur[i] for i in range(len(cur))]
-    #                 os.chdir('..')
-    #
-    #         for i in range(len(indexes)):
-    #             img_val += [img[indexes[i]]]
-    #
-    #         if mode == 'train_cross_validation':
-    #             for i in range(len(img_val)):
-    #                 img.remove(img_val[i])
-    #
-    #             with open(path + '/train_cross_validation_imgs.txt', 'w') as f:
-    #                 for i in range(len(img)):
-    #                     f.write(img[i] + '\n')
-    #
-    #         if mode == 'val_cross_validation':
-    #             with open(path + '/val_cross_validation_imgs.txt', 'w') as f:
-    #                 for i in range(len(img)):
-    #                     f.write(img[i] + '\n')
-    #
-    #     os.chdir('..')
+    @staticmethod
+    def create_img_txt(path: str, mode: str, indexes: list = []) -> None:
+        os.chdir(path)
+        img = []
+        # if mode == 'train':
+        #     os.chdir(mode)
+        #     class_list = os.listdir()
+        #     for class_ in tqdm(class_list):
+        #         if not class_.startswith('.'):
+        #             os.chdir(class_)
+        #             cur = os.listdir()
+        #             img += [path + '/train/' + class_ + '/' + cur[i] for i in range(len(cur))]
+        #             os.chdir('..')
+        #
+        #     with open(path + '/train_imgs.txt', 'w') as f:
+        #         for i in range(len(img)):
+        #             f.write(img[i] + '\n')
+
+        # if mode == 'test':
+        #     os.chdir(mode)
+        #     images = os.listdir()
+        #     img += images
+        #     img = [path + '/test/' + img[i] for i in range(len(img))]
+        #
+        #     with open(path + '/test_imgs.txt', 'w') as f:
+        #         for i in range(len(img)):
+        #             f.write(img[i] + '\n')
+
+        # if mode == 'unlabelled':
+        #     os.chdir(mode)
+        #     images = os.listdir()
+        #     img += images
+        #     img = [path + '/unlabelled/' + img[i] for i in range(len(img))]
+        #
+        #     with open(path + '/unlabelled_imgs.txt', 'w') as f:
+        #         for i in range(len(img)):
+        #             f.write(img[i] + '\n')
+
+        if mode == 'train_cross_validation' or mode == 'val_cross_validation':
+            os.chdir('train')
+            img_val = []
+            class_list = os.listdir()
+            print(class_list)
+            for class_ in tqdm(class_list):
+
+                if not class_.startswith('.'):
+                    os.chdir(class_)
+                    cur = os.listdir()
+                    img += [path + '/train/' + class_ + '/' + cur[i] for i in range(len(cur))]
+                    os.chdir('..')
+
+            for i in range(len(indexes)):
+                img_val += [img[indexes[i]]]
+
+            if mode == 'train_cross_validation':
+                for i in range(len(img_val)):
+                    img.remove(img_val[i])
+
+                with open(path + '/train_cross_validation_imgs.txt', 'w') as f:
+                    for i in range(len(img)):
+                        f.write(img[i] + '\n')
+
+            if mode == 'val_cross_validation':
+                with open(path + '/val_cross_validation_imgs.txt', 'w') as f:
+                    for i in range(len(img)):
+                        f.write(img[i] + '\n')
+
+        os.chdir('..')
     #
     # def get_image(self, img_path: str, labels_dict: dict = {}):
     #
@@ -121,7 +121,7 @@ class ModalDataset(Dataset):
         self.file_name = mode + '_imgs.txt'
 
         print(os.getcwd())
-        with open('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/labels_dict.json', 'r') as f:
+        with open(path + '/labels_dict.json', 'r') as f:
             self.labels_dict = json.load(f)
 
         #self.create_img_txt(path, mode, indexes=indexes)
