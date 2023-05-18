@@ -5,7 +5,7 @@ from torchvision.utils import make_grid
 from torchvision.io import read_image
 import torchvision.transforms as T
 import numpy as np
-from Preprocessing import data_augmentation_normalization_resize, add_random_blocks
+from utils.Preprocessing import data_augmentation_normalization_resize, add_random_blocks
 import os
 import matplotlib.pyplot as plt
 
@@ -100,6 +100,8 @@ class ModalDataset(Dataset):
             return img
 
     def get_labels_dict(self, path: str) -> dict:
+
+        print(os.getcwd())
 
         os.chdir(path)
 
