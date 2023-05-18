@@ -73,18 +73,25 @@ class ModalDataset(Dataset):
             for i in range(len(indexes)):
                 img_val += [img[indexes[i]]]
 
+            print(len(img))
+
+            os.chdir('..')
+
             if mode == 'train_cross_validation':
                 for i in range(len(img_val)):
                     img.remove(img_val[i])
 
-                with open(path + '/train_cross_validation_imgs.txt', 'w') as f:
+                print(len(img))
+                print(path)
+                print(os.getcwd())
+                with open('train_cross_validation_imgs.txt', 'w') as f:
                     for i in range(len(img)):
                         f.write(img[i] + '\n')
 
             if mode == 'val_cross_validation':
-                with open(path + '/val_cross_validation_imgs.txt', 'w') as f:
-                    for i in range(len(img)):
-                        f.write(img[i] + '\n')
+                with open('val_cross_validation_imgs.txt', 'w') as f:
+                    for i in range(len(img_val)):
+                        f.write(img_val[i] + '\n')
 
         os.chdir('..')
 
@@ -126,7 +133,8 @@ class ModalDataset(Dataset):
         self.create_img_txt(path, mode, indexes=indexes)
 
     def __len__(self) -> int:
-        with open(self.path + '/' + self.file_name, 'r') as f:
+        print(os.getcwd())
+        with open('/' + self.file_name, 'r') as f:
             return len(f.readlines())
 
     def __getitem__(self, idx) -> dict:
