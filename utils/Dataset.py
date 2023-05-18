@@ -7,6 +7,7 @@ import torchvision.transforms as T
 import numpy as np
 from utils.Preprocessing import data_augmentation_normalization_resize, add_random_blocks
 import os
+import json
 import matplotlib.pyplot as plt
 
 
@@ -118,7 +119,10 @@ class ModalDataset(Dataset):
         self.path = path
         self.mode = mode
         self.file_name = mode + '_imgs.txt'
-        self.labels_dict = self.get_labels_dict(path + '/train')
+
+        with open(path + '/labels_dict.json', 'r') as f:
+            self.labels_dict = json.load(f)
+
         #self.create_img_txt(path, mode, indexes=indexes)
 
     def __len__(self) -> int:
