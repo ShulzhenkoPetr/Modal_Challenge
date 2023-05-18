@@ -158,6 +158,8 @@ if __name__ == '__main__':
     path = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal'
     dataset = ModalDataset(mode, path, indexes=indexes)
     # a = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal/test/7hHUDQZ86TVerFY.jpg\n'
-    print(show_tensor_images(dataset.__getitem__(5)['image'], num_images=1))
+    show_tensor_images(dataset.__getitem__(5)['image'], num_images=1)
+    print(dataset.__len__())
     # a.rstrip('\n')
     # print(a)
+[lines[i].replave("", "") for i in range(len(lines))]
