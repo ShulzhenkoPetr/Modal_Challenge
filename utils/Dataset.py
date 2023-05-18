@@ -5,7 +5,7 @@ from torchvision.utils import make_grid
 from torchvision.io import read_image
 import torchvision.transforms as T
 import numpy as np
-from utils.Preprocessing import data_augmentation_normalization_resize, add_random_blocks
+from Preprocessing import data_augmentation_normalization_resize, add_random_blocks
 import os
 import json
 import matplotlib.pyplot as plt
@@ -162,11 +162,11 @@ class ModalDataset(Dataset):
 if __name__ == '__main__':
     mode = 'train'
     indexes = [0, 5, 4]
-    path = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal'
+    # path = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal'
+    path = '/Users/sanek_tarasov/Downloads/compressed_dataset'
     dataset = ModalDataset(mode, path, indexes=indexes)
     # a = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal/test/7hHUDQZ86TVerFY.jpg\n'
     show_tensor_images(dataset.__getitem__(5)['image'], num_images=1)
     print(dataset.__len__())
     # a.rstrip('\n')
     # print(a)
-[lines[i].replave("", "") for i in range(len(lines))]
