@@ -100,18 +100,18 @@ class ModalDataset(Dataset):
         else:
             return img
 
-    def get_labels_dict(self, path: str) -> dict:
-
-        print(os.getcwd())
-
-        os.chdir(path)
-
-        labels = os.listdir()
-        labels_dict = {}
-        for i in range(len(labels)):
-            labels_dict.update({labels[i]: i})
-        os.chdir('..')
-        return labels_dict
+    # def get_labels_dict(self, path: str) -> dict:
+    #
+    #     print(os.getcwd())
+    #
+    #     os.chdir(path)
+    #
+    #     labels = os.listdir()
+    #     labels_dict = {}
+    #     for i in range(len(labels)):
+    #         labels_dict.update({labels[i]: i})
+    #     os.chdir('..')
+    #     return labels_dict
 
     def __init__(self, mode: str, path: str, indexes: list = [], img_size: tuple = (224, 224)) -> None:
 
