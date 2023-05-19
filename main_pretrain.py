@@ -48,7 +48,6 @@ class OneImageFolder(Dataset):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path).convert('RGB')
 
-        # Apply transforms
         if self.transform:
             img = self.transform(img)
 
@@ -151,17 +150,9 @@ def main(args):
     dataset_train = OneImageFolder(os.path.join(args.data_path, 'unlabelled'), transform=transform_train)
     print(dataset_train)
 
-    if True:  # args.distributed:
-        num_tasks = misc.get_world_size()
-        global_rank = misc.get_rank()
-        sampler_train = torch.utils.data.DistributedSampler(
-            dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
-        )
-        print("Sampler_train = %s" % str(sampler_train))
-    else:
-        sampler_train = torch.utils.data.RandomSampler(dataset_train)
+    sampler_train = torch.utils.data.RandomSampler(dataset_train)
 
-    if global_rank == 0 and args.log_dir is not None:
+    if args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
         log_writer = SummaryWriter(log_dir=args.log_dir)
     else:
@@ -183,7 +174,8 @@ def main(args):
     model_without_ddp = model
     print("Model = %s" % str(model_without_ddp))
 
-    eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
+    # eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
+    eff_batch_size = args.batch_size * args.accum_iter * 1
 
     if args.lr is None:  # only base_lr is specified
         args.lr = args.blr * eff_batch_size / 256
