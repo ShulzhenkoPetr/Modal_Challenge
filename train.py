@@ -14,7 +14,7 @@ from models import ResNetFinetune
 from utils.Dataset import ModalDataset
 
 
-def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_cpu: int):
+def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_cpu: int, shuffle=True):
     """
     Creates a train data loader
     :param path: path to images
@@ -22,6 +22,7 @@ def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_c
     :param indices: indices for validation in cross validation
     :param batch_size: Size of a batch
     :param n_cpu: number of workers cpu
+    :param shuffle: bool - shuffle or not batches in dataloader
     :return torch DataLoader
     """
 
@@ -29,7 +30,7 @@ def create_data_loader(mode: str, path: str, indices: list, batch_size: int, n_c
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
-        shuffle=True,
+        shuffle=shuffle,
         num_workers=n_cpu)
     return dataloader
 
