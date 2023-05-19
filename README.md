@@ -1,5 +1,11 @@
 
-#INF473V Challenge
-Here we will try to solve Semi-Supervised / Active / Unsupervised Learning problem 
+# INF473V Challenge
 
-This branch is dedicated for a baseline solution  
+
+---
+## This branch is dedicated for a `FAISS` clustering.
+
+---
+
+ 
+Well, we'd like to do cluster the unlabeled images using FAISS to give them labels.  
