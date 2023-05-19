@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 
 
-class ResNetFinetune(nn.Module):
-    def __init__(self, num_classes):
+class ResNet(nn.Module):
+    def __init__(self):
         super().__init__()
 
         self.backbone = torchvision.models.resnet50(pretrained=True)
@@ -12,3 +12,9 @@ class ResNetFinetune(nn.Module):
     def forward(self, x):
         x = self.backbone(x)
         return x
+
+if __name__ == '__main__':
+
+    descr = ResNet()
+
+    img
