@@ -156,7 +156,7 @@ class ModalDataset(Dataset):
         with open(self.path + '/' + self.file_name, 'r') as f:
             return len(f.readlines())
 
-    def __getitem__(self, idx) -> dict:
+    def __getitem__(self, idx) -> tuple:
 
         if self.mode == 'train' or self.mode == 'train_cross_validation':
             with open(self.path + '/' + self.file_name, 'r') as f:
@@ -174,13 +174,13 @@ class ModalDataset(Dataset):
             with open(self.path + '/' + self.file_name, 'r') as f:
                 curr_imgs = f.readlines()
             img, target = self.get_image(curr_imgs[idx], self.labels_dict)
-            img = T.Resize(self.img_size)(img)
+            img = T.Resize(self.img_size, antialias=None)(img)
             return (img.to(float) / 255., target)
 
         if self.mode == 'test' or self.mode == 'unlabelled':
             with open(self.path + '/' + self.file_name, 'r') as f:
                 img = self.get_image(f.readlines()[idx])
-                img = T.Resize(self.img_size)(img)
+                img = T.Resize(self.img_size, antialias=None)(img)
             return (img.to(float) / 255.)
 
 

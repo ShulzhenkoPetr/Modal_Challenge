@@ -44,7 +44,7 @@ def len_dataset(path: str) -> int:
         return len(f.readlines())
 
 
-def evaluate(model, val_dataloader: DataLoader) -> tuple:
+def evaluate(model, val_dataloader: DataLoader, device) -> tuple:
     """
     Evaluates the model on a val set
     :param model: model
@@ -60,12 +60,12 @@ def evaluate(model, val_dataloader: DataLoader) -> tuple:
 
     for imgs, target in val_dataloader:
         # imgs = Variable(imgs.to(device, non_blocking=True), requires_grad=False)
-
+        imgs = imgs.float().to(device)
         with torch.no_grad():
             outputs = model(imgs)
-            loss = loss_fn(outputs)
+            loss = loss_fn(outputs, target.to(device))
 
-            acc = torch.sum(outputs.detach().cpu().numpy().argmax(dim=1) == target) / len(target)
+            acc = torch.sum(outputs.detach().cpu().argmax(dim=1) == target) / len(target)
 
             losses.append(loss.detach().cpu())
             accuracy.append(acc)
@@ -87,7 +87,8 @@ def train():
                         help="Path to checkpoint file (.weights or .pth). Starts training from checkpoint model")
     parser.add_argument("--checkpoint_interval", type=int, default=1,
                         help="Interval of epochs between saving model weights")
-    parser.add_argument("--checkpoint_dir", type=str, default="../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/Checkpoints",
+    parser.add_argument("--checkpoint_dir", type=str,
+                        default="../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/Checkpoints",
                         help="Directory in which the checkpoints are stored")
     parser.add_argument("--evaluation_interval", type=int, default=5,
                         help="Interval of epochs between evaluations on validation set")
@@ -149,6 +150,8 @@ def train():
         train_acc_list = []
         train_loss_list_local = []
         train_acc_list_local = []
+        val_loss_list_local = []
+        val_acc_list_local = []
 
         for epoch in range(1, args.epochs + 1):
             model.train()
@@ -160,42 +163,55 @@ def train():
                 loss = loss_fn(outputs, target.to(device))
                 loss.backward()
 
-                train_loss_list_local.append(loss)
-                train_acc_list_local.append(
-                    torch.sum(outputs.detach().cpu().numpy().argmax(dim=1) == target) / len(target)
-                )
-
                 # change lr ... ? maybe scheduler
 
                 optimizer.step()
                 optimizer.zero_grad()
 
-            #Naive Logging
+                train_loss_list_local.append(loss.detach().cpu())
+                train_acc_list_local.append(
+                    torch.sum(outputs.detach().cpu().argmax(dim=1) == target) / len(target)
+                )
+
+            # Naive Logging
             if epoch % args.evaluation_interval == 0:
                 train_loss_list.append(np.array(train_loss_list_local).mean())
                 train_acc_list.append(np.array(train_acc_list_local).mean())
 
-            # Evaluate
-            if epoch == args.epochs:
+                # Evaluate
+
                 print("\n---- Evaluating Model ----")
                 # Evaluate the model on the validation set
                 metrics_output = evaluate(
                     model,
-                    val_dataloader
+                    val_dataloader,
+                    device
                 )
-                print(metrics_output)
-                val_loss[i_fold] = metrics_output[0]
-                val_accuracy[i_fold] = metrics_output[1]
+                print("Loss and accuracy: ", metrics_output)
+                val_loss_list_local.append(metrics_output[0])
+                val_acc_list_local.append(metrics_output[1])
 
-                #Save the model
-                checkpoint_path = os.path.join(args.checkpoint_dir, f"resnet_fold{i_fold}.pth")
+                # Save the model
+                checkpoint_path = os.path.join(args.checkpoint_dir, f"resnet_fold{i_fold}_epoch_{epoch}.pth")
                 print(f"---- Saving checkpoint to: '{checkpoint_path}' ----")
                 torch.save(model.state_dict(), checkpoint_path)
 
-                #Display graphs
-                plt.plot(np.arange(1, args.epochs, args.evaluation_interval), train_loss_list, label='loss')
-                plt.plot(np.arange(1, args.epochs, args.evaluation_interval), train_acc_list, label='accuracy')
+            if epoch == args.epochs:
+                # Display graphs
+                print('\n')
+                print("Train loss: ", train_loss_list)
+                print("Train acc: ", train_acc_list)
+                print("Val loss: ", val_loss_list_local)
+                print("Vall acc: ", val_acc_list_local)
+                print('\n')
 
+                figure = plt.figure()
+                plt.plot(np.arange(1, args.epochs + 1, args.evaluation_interval), train_loss_list, label='loss')
+                plt.plot(np.arange(1, args.epochs + 1, args.evaluation_interval), train_acc_list, label='accuracy')
+                plt.show()
+
+                val_accuracy.append(val_acc_list_local[-1])
+                val_loss.append(val_loss_list_local[-1])
 
     print(val_accuracy)
     print(val_loss)
