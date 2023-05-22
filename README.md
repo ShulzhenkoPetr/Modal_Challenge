@@ -16,7 +16,7 @@ Well, we'd like to do cluster the unlabeled images using FAISS to give them labe
 
 * Use this approach to give the labels to unlabeled data 
 
-> Finally, train model on whole data.
+> Finally, use FAISS for images classification.
 
 ``References:``
 1. https://thetisdev.hashnode.dev/building-an-image-search-engine-with-python-and-faiss
