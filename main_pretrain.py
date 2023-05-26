@@ -40,13 +40,14 @@ from torch.utils.data import Dataset
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, folder_path, transform=None):
-        self.files = sorted(glob.glob("%s/*.*" % folder_path))
+    def __init__(self, txt_path, transform=None):
+        with open(txt_path, 'r') as f:
+            self.files = sorted(f.readlines())
         self.transform = transform
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
-        img = Image.open(img_path).convert('RGB')
+        img = Image.open(img_path.rstrip('\n')).convert('RGB')
 
         if self.transform:
             img = self.transform(img)
@@ -147,7 +148,7 @@ def main(args):
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    dataset_train = OneImageFolder(os.path.join(args.data_path, 'unlabelled'), transform=transform_train)
+    dataset_train = OneImageFolder(args.data_path, transform=transform_train)
     print(dataset_train)
 
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
