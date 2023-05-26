@@ -43,6 +43,11 @@ class OneImageFolder(Dataset):
     def __init__(self, txt_path, transform=None):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
+            print(sorted(f.readlines())[:15])
+
+        print(txt_path)
+        print()
+        print(len(self.files))
         self.transform = transform
 
     def __getitem__(self, index):
@@ -149,7 +154,7 @@ def main(args):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset_train = OneImageFolder(args.data_path, transform=transform_train)
-    print(dataset_train)
+    print(len(dataset_train))
 
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
 
