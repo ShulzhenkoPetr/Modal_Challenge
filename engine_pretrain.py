@@ -13,6 +13,7 @@ import sys
 from typing import Iterable
 
 import torch
+import tqdm
 
 import util.misc as misc
 import util.lr_sched as lr_sched
@@ -36,8 +37,8 @@ def train_one_epoch(model: torch.nn.Module,
     if log_writer is not None:
         print('log_dir: {}'.format(log_writer.log_dir))
 
-    print("CHANGED")
-    for data_iter_step, samples in enumerate(data_loader):
+    print("Epoch starts")
+    for data_iter_step, samples in enumerate(tqdm.tqdm(data_loader, desc=f"Training Epoch {epoch}")):
 
         # we use a per iteration (instead of per epoch) lr scheduler
         if data_iter_step % accum_iter == 0:

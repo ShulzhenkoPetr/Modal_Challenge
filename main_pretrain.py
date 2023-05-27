@@ -43,11 +43,7 @@ class OneImageFolder(Dataset):
     def __init__(self, txt_path, transform=None):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
-            print(sorted(f.readlines())[:15])
 
-        print(txt_path)
-        print()
-        print(len(self.files))
         self.transform = transform
 
     def __getitem__(self, index):
@@ -207,8 +203,8 @@ def main(args):
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
-        if args.distributed:
-            data_loader_train.sampler.set_epoch(epoch)
+        # if args.distributed:
+        #     data_loader_train.sampler.set_epoch(epoch)
         train_stats = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
