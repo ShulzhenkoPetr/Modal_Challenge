@@ -14,6 +14,7 @@ from typing import Iterable
 
 import torch
 import tqdm
+from torchvision.utils import make_grid
 
 import util.misc as misc
 import util.lr_sched as lr_sched
@@ -23,7 +24,8 @@ def train_one_epoch(model: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, loss_scaler,
                     log_writer=None,
-                    args=None):
+                    args=None,
+                    rnd_visual_samples=None):
     model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', misc.SmoothedValue(window_size=1, fmt='{value:.6f}'))
@@ -77,6 +79,12 @@ def train_one_epoch(model: torch.nn.Module,
             log_writer.add_scalar('train_loss', loss_value_reduce, epoch_1000x)
             log_writer.add_scalar('lr', lr, epoch_1000x)
 
+
+    if rnd_visual_samples:
+        with torch.no_grad():
+            visual_outputs = model(rnd_visual_samples)
+            # log_writer.add_image(f"Images_after_epoch_{epoch}", make_grid(visual_outputs), 0)
+            log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs.cpu(), 0)
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

@@ -155,10 +155,13 @@ def main(args):
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
 
     if args.log_dir is not None:
-        os.makedirs(args.log_dir, exist_ok=True)
-        log_writer = SummaryWriter(log_dir=args.log_dir)
+        log_dir = os.path.join(
+            args.log_dir,
+            args.model,
+            datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S"))
+        logger = SummaryWriter(log_dir)
     else:
-        log_writer = None
+        logger = None
 
     data_loader_train = torch.utils.data.DataLoader(
         dataset_train, sampler=sampler_train,
@@ -188,9 +191,9 @@ def main(args):
     print("accumulate grad iterations: %d" % args.accum_iter)
     print("effective batch size: %d" % eff_batch_size)
 
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
-        model_without_ddp = model.module
+    # if args.distributed:
+    #     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
+    #     model_without_ddp = model.module
 
     # following timm: set wd as 0 for bias and norm layers
     param_groups = optim_factory.add_weight_decay(model_without_ddp, args.weight_decay)
@@ -203,15 +206,17 @@ def main(args):
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
-        # if args.distributed:
-        #     data_loader_train.sampler.set_epoch(epoch)
+
+        rnd_visual_samples = [dataset_train[10], dataset_train[1000], dataset_train[10000]]
+
         train_stats = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
-            log_writer=log_writer,
-            args=args
+            log_writer=logger,
+            args=args,
+            rnd_visual_samples=rnd_visual_samples
         )
-        if args.output_dir and (epoch % 20 == 0 or epoch + 1 == args.epochs):
+        if args.output_dir:
             misc.save_model(
                 args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
                 loss_scaler=loss_scaler, epoch=epoch)
@@ -220,8 +225,8 @@ def main(args):
                      'epoch': epoch, }
 
         if args.output_dir and misc.is_main_process():
-            if log_writer is not None:
-                log_writer.flush()
+            if logger is not None:
+                logger.flush()
             with open(os.path.join(args.output_dir, "log.txt"), mode="a", encoding="utf-8") as f:
                 f.write(json.dumps(log_stats) + "\n")
 
