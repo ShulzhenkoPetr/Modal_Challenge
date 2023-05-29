@@ -109,6 +109,10 @@ def get_args_parser():
     parser.add_argument('--resume', default='',
                         help='resume from checkpoint')
 
+    parser.add_argument('--pretrained_encoder', default='',
+                        help='path to pretrained ViT encoder weights')
+
+
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--num_workers', default=10, type=int)
@@ -174,10 +178,10 @@ def main(args):
     # define the model
     model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
-    model.to(device)
-
-    model_without_ddp = model
-    print("Model = %s" % str(model_without_ddp))
+    # model.to(device)
+    #
+    # model_without_ddp = model
+    print("Model = %s" % str(model))
 
     # eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
     eff_batch_size = args.batch_size * args.accum_iter * 1
@@ -201,7 +205,35 @@ def main(args):
     print(optimizer)
     loss_scaler = NativeScaler()
 
-    misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
+
+    #Load model:
+    #load weights from checkpoint
+    misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
+
+    # Unfreeze encoder layers ..
+
+    #Load pretrained frozen encoder
+    if args.pretrained_encoder:
+        encoder_weights = torch.load(args.pretrained_encoder, map_location='cpu')
+        encoder_layers = list(encoder_weights['model'].keys())
+
+        sd = model.state_dict()
+
+        with torch.no_grad():
+            for layer in sd:
+                if layer in encoder_layers:
+                    sd[layer].data = encoder_weights['model'][layer].data
+
+        model.load_state_dict(sd)
+
+        #Freeze encoder layers
+        for i, param in enumerate(model.parameters()):
+            if model.state_dict()[i] in encoder_layers:
+                param.requires_grad_(False)
+
+    model.to(device)
+
+    #Training loop:
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
