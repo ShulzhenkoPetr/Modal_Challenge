@@ -227,8 +227,9 @@ def main(args):
         model.load_state_dict(sd)
 
         #Freeze encoder layers
+        mae_layers = list(model.state_dict().keys())
         for i, param in enumerate(model.parameters()):
-            if model.state_dict()[i] in encoder_layers:
+            if mae_layers[i] in encoder_layers:
                 param.requires_grad_(False)
 
     model.to(device)
