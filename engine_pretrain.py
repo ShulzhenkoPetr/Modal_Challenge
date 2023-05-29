@@ -80,7 +80,7 @@ def train_one_epoch(model: torch.nn.Module,
     #         log_writer.add_scalar('lr', lr, epoch_1000x)
 
 
-    if rnd_visual_samples:
+    if rnd_visual_samples is not None:
         with torch.no_grad():
             visual_outputs = model(rnd_visual_samples)
             # log_writer.add_image(f"Images_after_epoch_{epoch}", make_grid(visual_outputs), 0)
