@@ -16,6 +16,8 @@ import torch
 import tqdm
 from torchvision.utils import make_grid
 
+from transformers import AutoImageProcessor
+
 import util.misc as misc
 import util.lr_sched as lr_sched
 
@@ -50,7 +52,10 @@ def train_one_epoch(model: torch.nn.Module,
 
         with torch.cuda.amp.autocast():
             if args.hugging_mae:
-                loss, _, _, _, _, _ = model(samples, mask_ratio=args.mask_ratio)
+                image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+                inputs = image_processor(images=samples, return_tensors="pt")
+                outputs = model(**inputs)
+                loss = outputs.loss
             else:
                 loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
 
@@ -85,9 +90,11 @@ def train_one_epoch(model: torch.nn.Module,
 
     if rnd_visual_samples is not None:
         with torch.no_grad():
-
             if args.hugging_mae:
-                loss, visual_outputs, masks, _, _, _ = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
+                image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+                inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
+                outputs = model(**inputs)
+                visual_outputs = outputs.logits
             else:
                 loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
 
