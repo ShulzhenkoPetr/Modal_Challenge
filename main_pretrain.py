@@ -27,6 +27,8 @@ import timm
 assert timm.__version__ == "0.3.2"  # version check
 import timm.optim.optim_factory as optim_factory
 
+from transformers import ViTMAEForPreTraining
+
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
@@ -111,6 +113,8 @@ def get_args_parser():
 
     parser.add_argument('--pretrained_encoder', default='',
                         help='path to pretrained ViT encoder weights')
+    parser.add_argument('--hugging_mae', action='store_true',
+                        help='Hugging Face pretrained encoder-decoder model')
 
 
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
@@ -176,7 +180,10 @@ def main(args):
     )
 
     # define the model
-    model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
+    if args.hugging_mae:
+        model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
+    else:
+        model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
     # model.to(device)
     #
@@ -208,7 +215,8 @@ def main(args):
 
     #Load model:
     #load weights from checkpoint
-    misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
+    if not args.hugging_mae:
+        misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
 
     # Unfreeze encoder layers ..
 

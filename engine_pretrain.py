@@ -84,7 +84,6 @@ def train_one_epoch(model: torch.nn.Module,
         with torch.no_grad():
             loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
 
-            print(visual_outputs)
             visual_outputs = model.unpatchify(visual_outputs)
             #visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
             log_writer.add_image(f"Images_after_epoch_{epoch}", make_grid(visual_outputs), 0)
