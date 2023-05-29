@@ -91,6 +91,7 @@ def train_one_epoch(model: torch.nn.Module,
             log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs, 0)
 
     # gather the stats from all processes
-    metric_logger.synchronize_between_processes()
-    print("Averaged stats:", metric_logger)
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    # metric_logger.synchronize_between_processes()
+    # print("Averaged stats:", metric_logger)
+    # return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    return {'x': 0}
