@@ -240,7 +240,8 @@ def main(args):
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
 
-        rnd_visual_samples = [dataset_train[10], dataset_train[1000], dataset_train[10000]]
+        rnd_visual_samples = torch.Tensor([dataset_train[10], dataset_train[1000], dataset_train[10000]])
+        print(type(dataset_train[10]))
 
         train_stats = train_one_epoch(
             model, data_loader_train,
