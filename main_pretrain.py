@@ -181,7 +181,10 @@ def main(args):
 
     # define the model
     if args.hugging_mae:
-        model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
+        if args.resume:
+            model = ViTMAEForPreTraining.from_pretrained(args.resume)
+        else:
+            model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
     else:
         model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 

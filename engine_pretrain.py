@@ -49,7 +49,10 @@ def train_one_epoch(model: torch.nn.Module,
         samples = samples.to(device, non_blocking=True)
 
         with torch.cuda.amp.autocast():
-            loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
+            if args.hugging_mae:
+                loss, _, _, _, _, _ = model(samples, mask_ratio=args.mask_ratio)
+            else:
+                loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
 
         loss_value = loss.item()
 
@@ -82,7 +85,11 @@ def train_one_epoch(model: torch.nn.Module,
 
     if rnd_visual_samples is not None:
         with torch.no_grad():
-            loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
+
+            if args.hugging_mae:
+                loss, visual_outputs, masks, _, _, _ = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
+            else:
+                loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
 
             visual_outputs = model.unpatchify(visual_outputs)
             #visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
