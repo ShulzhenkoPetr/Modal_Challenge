@@ -42,18 +42,22 @@ from torch.utils.data import Dataset
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, txt_path, transform=None):
+    def __init__(self, txt_path, transform=None, hugging_mae=False):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
 
         self.transform = transform
+        self.hugging_mae = hugging_mae
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
 
         if self.transform:
-            img = self.transform(img)
+            if self.hugging_mae:
+                img = self.transform(images=img, return_tensors="pt")
+            else:
+                img = self.transform(img)
 
         return img
 
@@ -153,7 +157,8 @@ def main(args):
 
     # simple augmentation
     if args.hugging_mae:
-        transform_train = None
+        image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+        transform_train = image_processor
     else:
         transform_train = transforms.Compose([
             transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
@@ -161,7 +166,11 @@ def main(args):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-    dataset_train = OneImageFolder(args.data_path, transform=transform_train)
+    dataset_train = OneImageFolder(
+                            args.data_path,
+                            transform=transform_train,
+                            hugging_mae=args.huggin_mae
+    )
     print(len(dataset_train))
 
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
@@ -250,29 +259,25 @@ def main(args):
     model.to(device)
 
     #Training loop:
-    if args.hugging_mae:
-        image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
-    else:
-        image_processor = None
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
 
-        if args.hugging_mae:
-            rnd_visual_samples = image_processor(
-                images=[dataset_train[10], dataset_train[1000], dataset_train[10000]],
-                return_tensors="pt"
-            )
-        else:
-            rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+        # if args.hugging_mae:
+        #     rnd_visual_samples = image_processor(
+        #         images=[dataset_train[10], dataset_train[1000], dataset_train[10000]],
+        #         return_tensors="pt"
+        #     )
+        # else:
+        rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
 
         train_stats = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
             log_writer=logger,
             args=args,
-            image_processor=image_processor,
+            #image_processor=image_processor,
             rnd_visual_samples=rnd_visual_samples
         )
         if args.output_dir:

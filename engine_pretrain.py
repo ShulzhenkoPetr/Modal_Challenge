@@ -27,7 +27,7 @@ def train_one_epoch(model: torch.nn.Module,
                     device: torch.device, epoch: int, loss_scaler,
                     log_writer=None,
                     args=None,
-                    image_processor=None,
+                    #image_processor=None,
                     rnd_visual_samples=None):
     model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
@@ -53,8 +53,8 @@ def train_one_epoch(model: torch.nn.Module,
 
         with torch.cuda.amp.autocast():
             if args.hugging_mae:
-                inputs = image_processor(images=samples, return_tensors="pt")
-                outputs = model(**inputs)
+                #inputs = image_processor(images=samples, return_tensors="pt")
+                outputs = model(**samples)
                 loss = outputs.loss
             else:
                 loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
@@ -91,8 +91,8 @@ def train_one_epoch(model: torch.nn.Module,
     if rnd_visual_samples is not None:
         with torch.no_grad():
             if args.hugging_mae:
-                inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
-                outputs = model(**inputs)
+                #inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
+                outputs = model(**rnd_visual_samples)
                 visual_outputs = outputs.logits
             else:
                 loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
