@@ -82,9 +82,11 @@ def train_one_epoch(model: torch.nn.Module,
 
     if rnd_visual_samples is not None:
         with torch.no_grad():
-            visual_outputs = model(rnd_visual_samples)
+            loss, visual_outputs, masks = model(rnd_visual_samples)
             # log_writer.add_image(f"Images_after_epoch_{epoch}", make_grid(visual_outputs), 0)
-            log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs.cpu(), 0)
+            visual_outputs = model.unpatchify(visual_outputs)
+            visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
+            log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs, 0)
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
