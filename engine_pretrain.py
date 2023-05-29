@@ -87,7 +87,7 @@ def train_one_epoch(model: torch.nn.Module,
 
             print(visual_outputs)
             visual_outputs = model.unpatchify(visual_outputs)
-            visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
+            #visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
             log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs, 0)
 
     # gather the stats from all processes
