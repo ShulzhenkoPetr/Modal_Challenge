@@ -27,14 +27,13 @@ def train_one_epoch(model: torch.nn.Module,
                     device: torch.device, epoch: int, loss_scaler,
                     log_writer=None,
                     args=None,
+                    image_processor=None,
                     rnd_visual_samples=None):
     model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', misc.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 20
-
-    image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
 
     accum_iter = args.accum_iter
 

@@ -250,18 +250,29 @@ def main(args):
     model.to(device)
 
     #Training loop:
+    if args.hugging_mae:
+        image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+    else:
+        image_processor = None
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
 
-        rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+        if args.hugging_mae:
+            rnd_visual_samples = image_processor(
+                images=[dataset_train[10], dataset_train[1000], dataset_train[10000]],
+                return_tensors="pt"
+            )
+        else:
+            rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
 
         train_stats = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
             log_writer=logger,
             args=args,
+            image_processor=image_processor,
             rnd_visual_samples=rnd_visual_samples
         )
         if args.output_dir:
