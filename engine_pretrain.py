@@ -34,6 +34,8 @@ def train_one_epoch(model: torch.nn.Module,
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 20
 
+    image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+
     accum_iter = args.accum_iter
 
     optimizer.zero_grad()
@@ -52,7 +54,6 @@ def train_one_epoch(model: torch.nn.Module,
 
         with torch.cuda.amp.autocast():
             if args.hugging_mae:
-                image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
                 inputs = image_processor(images=samples, return_tensors="pt")
                 outputs = model(**inputs)
                 loss = outputs.loss
@@ -91,7 +92,6 @@ def train_one_epoch(model: torch.nn.Module,
     if rnd_visual_samples is not None:
         with torch.no_grad():
             if args.hugging_mae:
-                image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
                 inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
                 outputs = model(**inputs)
                 visual_outputs = outputs.logits
