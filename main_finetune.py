@@ -40,6 +40,7 @@ from engine_finetune import train_one_epoch, evaluate
 
 from PIL import Image
 from torch.utils.data import Dataset
+from torchvision import datasets, transforms
 
 
 def get_args_parser():
@@ -172,6 +173,7 @@ class OneImageFolder(Dataset):
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
+        label = img_path.replace('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/', '').split('/')[1]
 
         if self.transform:
             if self.hugging_mae:
@@ -181,7 +183,7 @@ class OneImageFolder(Dataset):
             else:
                 img = self.transform(img)
 
-        return img
+        return img, label
 
 
 
