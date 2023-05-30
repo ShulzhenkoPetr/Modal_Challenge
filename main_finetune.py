@@ -159,6 +159,8 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
 
+    parser.add_argument('--hugging_mae', default=False)
+
     return parser
 
 
@@ -184,6 +186,9 @@ class OneImageFolder(Dataset):
                 img = self.transform(img)
 
         return img, label
+
+    def __len__(self):
+        return len(self.files)
 
 
 
@@ -264,7 +269,7 @@ def main(args):
         global_pool=args.global_pool,
     )
 
-    if args.finetune and not args.eval and not args.resume_checkpoint:
+    if args.finetune and not args.eval and not args.resume:
         checkpoint = torch.load(args.finetune, map_location='cpu')
 
         print("Load pre-trained (encoder) checkpoint from: %s" % args.finetune)
