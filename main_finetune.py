@@ -179,7 +179,7 @@ class OneImageFolder(Dataset):
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
-        label_str = img_path.replace('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/', '').split('/')[1]
+        label_str = img_path.replace('/content/gdrive/MyDrive/Colab_Notebooks/Modal/', '').split('/')[1]
         label = self.labels_dict[label_str]
 
         if self.transform:
