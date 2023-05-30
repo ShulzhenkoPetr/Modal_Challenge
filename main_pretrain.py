@@ -57,6 +57,7 @@ class OneImageFolder(Dataset):
             if self.hugging_mae:
                 img = self.transform(images=img, return_tensors="pt")
                 img = img['pixel_values']
+                img = img.view(img.shape[1], img.shape[2], img.shape[3])
             else:
                 img = self.transform(img)
 
