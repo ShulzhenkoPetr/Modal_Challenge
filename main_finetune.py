@@ -209,7 +209,7 @@ def main(args):
 
     #Create datasets
     transform_train = build_transform(True, args)
-    transform_val = torchvision.transforms.ToTensor
+    transform_val = transforms.ToTensor
 
     dataset_train = OneImageFolder(
         args.data_path_train,
