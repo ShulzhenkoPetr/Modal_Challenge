@@ -272,9 +272,9 @@ def main(args):
         #     )
         # else:
 
-        #rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+        rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
 
-        rnd_visual_samples = None
+        #rnd_visual_samples = None
 
         train_stats = train_one_epoch(
             model, data_loader_train,

@@ -54,7 +54,7 @@ def train_one_epoch(model: torch.nn.Module,
         with torch.cuda.amp.autocast():
             if args.hugging_mae:
                 #inputs = image_processor(images=samples, return_tensors="pt")
-                print(samples.shape)
+
                 outputs = model(samples)
                 loss = outputs.loss
             else:
@@ -93,7 +93,7 @@ def train_one_epoch(model: torch.nn.Module,
         with torch.no_grad():
             if args.hugging_mae:
                 #inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
-                outputs = model(**rnd_visual_samples)
+                outputs = model(rnd_visual_samples)
                 visual_outputs = outputs.logits
             else:
                 loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
