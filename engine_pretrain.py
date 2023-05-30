@@ -54,9 +54,8 @@ def train_one_epoch(model: torch.nn.Module,
         with torch.cuda.amp.autocast():
             if args.hugging_mae:
                 #inputs = image_processor(images=samples, return_tensors="pt")
-                print(samples)
-                print(**samples)
-                outputs = model(**samples)
+                print(samples.shape)
+                outputs = model(samples)
                 loss = outputs.loss
             else:
                 loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
