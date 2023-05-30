@@ -169,7 +169,7 @@ def main(args):
     dataset_train = OneImageFolder(
                             args.data_path,
                             transform=transform_train,
-                            hugging_mae=args.huggin_mae
+                            hugging_mae=args.hugging_mae
     )
     print(len(dataset_train))
 
@@ -270,7 +270,10 @@ def main(args):
         #         return_tensors="pt"
         #     )
         # else:
-        rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+
+        #rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+
+        rnd_visual_samples = None
 
         train_stats = train_one_epoch(
             model, data_loader_train,
