@@ -169,13 +169,18 @@ class OneImageFolder(Dataset):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
 
+        with open('Modal_Challenge/labels_dict.json', 'r') as f:
+            self.labels_dict = json.load(f)
+
         self.transform = transform
         self.hugging_mae = hugging_mae
+
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
-        label = img_path.replace('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/', '').split('/')[1]
+        label_str = img_path.replace('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/', '').split('/')[1]
+        label = self.labels_dict[label_str]
 
         if self.transform:
             if self.hugging_mae:
