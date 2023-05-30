@@ -209,6 +209,7 @@ def main(args):
 
     #Create datasets
     transform_train = build_transform(True, args)
+    transform_val = torchvision.transforms.ToTensor
 
     dataset_train = OneImageFolder(
         args.data_path_train,
@@ -219,10 +220,10 @@ def main(args):
 
     dataset_val = OneImageFolder(
         args.data_path_val,
-        transform=transform_train,
+        transform=transform_val,
         hugging_mae=args.hugging_mae
     )
-    print(len(dataset_train))
+    print(len(dataset_val))
 
 
 
