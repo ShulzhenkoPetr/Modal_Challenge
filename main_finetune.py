@@ -277,6 +277,8 @@ def main(args):
     if args.hugging_mae:
         model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224")
         model.classifier.out_features = 48
+        model.classifier.weight = torch.nn.Parameter(model.classifier.weight[:48, :])
+        model.classifier.bias = torch.nn.Parameter(torch.randn(48))
     else:
         model = models_vit.__dict__[args.model](
             num_classes=args.nb_classes,
