@@ -161,7 +161,7 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
 
-    parser.add_argument('--hugging_mae', default=False)
+    parser.add_argument('--hugging_mae', action='store_true')
 
     return parser
 
