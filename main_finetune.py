@@ -334,10 +334,15 @@ def main(args):
     #     model_without_ddp = model.module
 
     # build optimizer with layer-wise lr decay (lrd)
-    param_groups = lrd.param_groups_lrd(model, args.weight_decay,
-        no_weight_decay_list=model.no_weight_decay(),
-        layer_decay=args.layer_decay
-    )
+    if args.huggin_mae:
+        param_groups = lrd.param_groups_lrd(model, args.weight_decay,
+                                            layer_decay=args.layer_decay
+                                            )
+    else:
+        param_groups = lrd.param_groups_lrd(model, args.weight_decay,
+            no_weight_decay_list=model.no_weight_decay(),
+            layer_decay=args.layer_decay
+        )
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr)
     loss_scaler = NativeScaler()
 
