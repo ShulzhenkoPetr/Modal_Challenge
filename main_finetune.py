@@ -168,13 +168,14 @@ def get_args_parser():
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, txt_path, transform=None, hugging_mae=False):
+    def __init__(self, txt_path, is_Train, transform=None, hugging_mae=False):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
 
         with open('Modal_Challenge/labels_dict.json', 'r') as f:
             self.labels_dict = json.load(f)
 
+        self.is_Train = is_Train
         self.transform = transform
         self.hugging_mae = hugging_mae
 
@@ -225,6 +226,7 @@ def main(args):
 
     dataset_train = OneImageFolder(
         args.data_path_train,
+        True,
         transform=transform_train,
         hugging_mae=args.hugging_mae
     )
@@ -232,6 +234,7 @@ def main(args):
 
     dataset_val = OneImageFolder(
         args.data_path_val,
+        False,
         transform=transform_val,
         hugging_mae=args.hugging_mae
     )
