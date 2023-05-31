@@ -168,14 +168,14 @@ def get_args_parser():
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, txt_path, is_Train, transform=None, hugging_mae=False):
+    def __init__(self, txt_path, is_train, transform=None, hugging_mae=False):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
 
         with open('Modal_Challenge/labels_dict.json', 'r') as f:
             self.labels_dict = json.load(f)
 
-        self.is_Train = is_Train
+        self.is_Train = is_train
         self.transform = transform
         self.hugging_mae = hugging_mae
 
@@ -183,7 +183,7 @@ class OneImageFolder(Dataset):
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
-        label_str = img_path.replace('/content/gdrive/MyDrive/Colab_Notebooks/Modal/', '').split('/')[1]
+        label_str = img_path.replace('/content/gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/', '').split('/')[1]
         label = self.labels_dict[label_str]
 
         if self.transform:
@@ -222,7 +222,7 @@ def main(args):
     else:
         transform_train = build_transform(True, args)
     transform_val = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Resize(args.input_size)])
+                                        transforms.Resize(args.input_size, antialias=True)])
 
     dataset_train = OneImageFolder(
         args.data_path_train,
@@ -362,7 +362,11 @@ def main(args):
     print("criterion = %s" % str(criterion))
 
     if args.resume:
-        misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
+        if args.hugging_mae:
+            checkpoint = torch.load(args.resume)
+            model.load_state_dict(checkpoint)
+        else:
+            misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
 
     model.to(device)
 
