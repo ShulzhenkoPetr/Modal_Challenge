@@ -27,6 +27,7 @@ assert timm.__version__ == "0.3.2" # version check
 from timm.models.layers import trunc_normal_
 from timm.data.mixup import Mixup
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
+import timm.optim.optim_factory as optim_factory
 
 import util.lr_decay as lrd
 import util.misc as misc
@@ -334,10 +335,8 @@ def main(args):
     #     model_without_ddp = model.module
 
     # build optimizer with layer-wise lr decay (lrd)
-    if args.huggin_mae:
-        param_groups = lrd.param_groups_lrd(model, args.weight_decay,
-                                            layer_decay=args.layer_decay
-                                            )
+    if args.hugging_mae:
+        param_groups = optim_factory.add_weight_decay(model, args.weight_decay)
     else:
         param_groups = lrd.param_groups_lrd(model, args.weight_decay,
             no_weight_decay_list=model.no_weight_decay(),
