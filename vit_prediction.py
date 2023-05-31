@@ -11,7 +11,10 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
 
+import tqdm
+
 from PIL import Image
+
 
 class OneImageFolder(Dataset):
     def __init__(self, txt_path, transform=None, hugging_mae=False):
@@ -23,7 +26,6 @@ class OneImageFolder(Dataset):
 
         self.transform = transform
         self.hugging_mae = hugging_mae
-
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
@@ -43,7 +45,7 @@ def main(args):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     test_transforms = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Resize(args.input_size, antialias=True)])
+                                          transforms.Resize(args.input_size, antialias=True)])
 
     dataset_test = OneImageFolder(
         args.data_path_test,
@@ -70,19 +72,18 @@ def main(args):
         model.classifier.bias = torch.nn.Parameter(torch.randn(48))
 
         checkpoint = torch.load(args.resume)
-        model.load_state_dict(checkpoint)
+        model.load_state_dict(checkpoint['model'])
 
     model.to(device)
 
     confident_names = []
-    result = {}
     submission = pd.DataFrame(columns=["id", "label"])
 
     with torch.no_grad():
 
         model.eval()
 
-        for batch in data_loader_test:
+        for batch in tqdm.tqdm(data_loader_test):
             images = batch[0]
             names = batch[-1]
             images = images.to(device, non_blocking=True)
@@ -91,39 +92,39 @@ def main(args):
                 output = model(images)
                 output_logits = output.logits
 
-            label_digits = output_logits.argmax(dim=1).cpu()
+            label_digits = output_logits.argmax(dim=1)
 
-            for name, label in zip(names, label_digits):
-                result[name] = digit_class_names_dict[label]
+            predictions = [digit_class_names_dict[pred] for pred in label_digits.cpu().numpy()]
 
+            submission = pd.concat(
+                [
+                    submission,
+                    pd.DataFrame({"id": names, "label": predictions}),
+                ]
+            )
 
-            #Sort samples with strong confidence
-
-            confidence = output_logits.max(dim=1).cpu().numpy()
+            # Sort samples with strong confidence
+            names = np.array(names)
+            confidence = output_logits.max(dim=1).values.cpu().numpy()
             high_confidence_names = names[confidence > 0.7]
 
             confident_names.extend(high_confidence_names)
 
-    with open(args.output_dir + '/high_confidence_names.txt') as f:
-        f.writelines(confident_names)
+    submission.to_csv(args.output_dir + '/submission.csv', index=False)
 
-    with open(args.output_dir + '/spread_curve.csv', 'a', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=output.keys())
-        writer.writerow(output)
-
-
-
-
+    with open(args.output_dir + '/high_confidence_names.txt', 'w') as f:
+        f.write("\n".join(confident_names))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('ViT / MAE prediction', add_help=False)
-    parser.add_argument('--data_test', default='', help='path to test data txt')
+    parser.add_argument('--data_path_test', default='', help='path to test data txt')
     parser.add_argument('--hugging_mae', action='store_true')
     parser.add_argument('--resume', default='',
                         help='path to checkpoint .pth')
     parser.add_argument('--output_dir', default='')
 
+    parser.add_argument('--input_size', default=224)
     parser.add_argument('--batch_size', default=64)
     parser.add_argument('--num_workers', default=10)
     parser.add_argument('--pin_mem', action='store_true',
