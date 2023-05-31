@@ -113,7 +113,7 @@ def main(args):
     submission.to_csv(args.output_dir + '/submission.csv', index=False)
 
     with open(args.output_dir + '/high_confidence_names.txt', 'w') as f:
-        f.write("\n".join(confident_names))
+        f.write("".join(confident_names))
 
 
 if __name__ == '__main__':
