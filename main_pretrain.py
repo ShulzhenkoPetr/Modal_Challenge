@@ -196,14 +196,11 @@ def main(args):
 
     # define the model
     if args.hugging_mae:
-        if args.resume:
-            model = ViTMAEForPreTraining.from_pretrained(args.resume)
-        else:
-            model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
+        model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
     else:
         model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
-    # model.to(device)
+    model.to(device)
     #
     # model_without_ddp = model
     print("Model = %s" % str(model))
@@ -233,7 +230,7 @@ def main(args):
 
     #Load model:
     #load weights from checkpoint
-    if not args.hugging_mae:
+    if args.resume:
         misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
 
     # Unfreeze encoder layers ..

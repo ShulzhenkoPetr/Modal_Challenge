@@ -36,6 +36,8 @@ from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
 import models_vit
 
+from transformers import ViTMAEModel, AutoImageProcessor, ViTForImageClassification
+
 from engine_finetune import train_one_epoch, evaluate
 
 from PIL import Image
@@ -213,7 +215,10 @@ def main(args):
     cudnn.benchmark = True
 
     #Create datasets
-    transform_train = build_transform(True, args)
+    if args.hugging_mae:
+        transform_train = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
+    else:
+        transform_train = build_transform(True, args)
     transform_val = transforms.ToTensor
 
     dataset_train = OneImageFolder(
@@ -229,7 +234,6 @@ def main(args):
         hugging_mae=args.hugging_mae
     )
     print(len(dataset_val))
-
 
 
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
@@ -268,12 +272,16 @@ def main(args):
             mixup_alpha=args.mixup, cutmix_alpha=args.cutmix, cutmix_minmax=args.cutmix_minmax,
             prob=args.mixup_prob, switch_prob=args.mixup_switch_prob, mode=args.mixup_mode,
             label_smoothing=args.smoothing, num_classes=args.nb_classes)
-    
-    model = models_vit.__dict__[args.model](
-        num_classes=args.nb_classes,
-        drop_path_rate=args.drop_path,
-        global_pool=args.global_pool,
-    )
+
+    if args.hugging_mae:
+        model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224")
+        model.classifier.out_features = 48
+    else:
+        model = models_vit.__dict__[args.model](
+            num_classes=args.nb_classes,
+            drop_path_rate=args.drop_path,
+            global_pool=args.global_pool,
+        )
 
     if args.finetune and not args.eval and not args.resume:
         checkpoint = torch.load(args.finetune, map_location='cpu')
@@ -302,7 +310,7 @@ def main(args):
         trunc_normal_(model.head.weight, std=2e-5)
 
 
-    # model.to(device)
+    model.to(device)
     #
     # model_without_ddp = model
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -346,6 +354,8 @@ def main(args):
     if args.resume:
         misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
 
+    model.to(device)
+
     if args.eval:
         test_stats = evaluate(data_loader_val, model, device)
         print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
@@ -355,8 +365,6 @@ def main(args):
     start_time = time.time()
     max_accuracy = 0.0
     for epoch in range(args.start_epoch, args.epochs):
-        if args.distributed:
-            data_loader_train.sampler.set_epoch(epoch)
         train_stats = train_one_epoch(
             model, criterion, data_loader_train,
             optimizer, device, epoch, loss_scaler,

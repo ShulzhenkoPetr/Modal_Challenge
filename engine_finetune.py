@@ -50,7 +50,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         if data_iter_step % accum_iter == 0:
             lr_sched.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
 
-        samples = samples.to(device, non_blocking=True).float()
+        samples = samples.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
         targets = targets.float()
 
