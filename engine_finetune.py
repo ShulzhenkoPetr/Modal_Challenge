@@ -123,7 +123,7 @@ def evaluate(data_loader, model, device):
             output_logits = output.logits
             loss = criterion(output_logits, target)
 
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        acc1, acc5 = accuracy(output.logits, target, topk=(1, 5))
 
         batch_size = images.shape[0]
         metric_logger.update(loss=loss.item())

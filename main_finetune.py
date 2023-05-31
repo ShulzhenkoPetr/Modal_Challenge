@@ -186,7 +186,7 @@ class OneImageFolder(Dataset):
         label = self.labels_dict[label_str]
 
         if self.transform:
-            if self.hugging_mae:
+            if self.hugging_mae and self.is_Train:
                 img = self.transform(images=img, return_tensors="pt")
                 img = img['pixel_values']
                 img = img.view(img.shape[1], img.shape[2], img.shape[3])
@@ -220,7 +220,8 @@ def main(args):
         transform_train = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
     else:
         transform_train = build_transform(True, args)
-    transform_val = transforms.ToTensor
+    transform_val = transforms.Compose([transforms.ToTensor(),
+                                        transforms.Resize(args.input_size)])
 
     dataset_train = OneImageFolder(
         args.data_path_train,
