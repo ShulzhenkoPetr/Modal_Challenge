@@ -13,6 +13,10 @@ import sys
 from typing import Iterable
 
 import torch
+import tqdm
+from torchvision.utils import make_grid
+
+from transformers import AutoImageProcessor
 
 import util.misc as misc
 import util.lr_sched as lr_sched
@@ -22,7 +26,9 @@ def train_one_epoch(model: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, loss_scaler,
                     log_writer=None,
-                    args=None):
+                    args=None,
+                    #image_processor=None,
+                    rnd_visual_samples=None):
     model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', misc.SmoothedValue(window_size=1, fmt='{value:.6f}'))
@@ -36,8 +42,8 @@ def train_one_epoch(model: torch.nn.Module,
     if log_writer is not None:
         print('log_dir: {}'.format(log_writer.log_dir))
 
-    print("CHANGED")
-    for data_iter_step, samples in enumerate(data_loader):
+    print("Epoch starts")
+    for data_iter_step, samples in enumerate(tqdm.tqdm(data_loader, desc=f"Training Epoch {epoch}")):
 
         # we use a per iteration (instead of per epoch) lr scheduler
         if data_iter_step % accum_iter == 0:
@@ -46,7 +52,13 @@ def train_one_epoch(model: torch.nn.Module,
         samples = samples.to(device, non_blocking=True)
 
         with torch.cuda.amp.autocast():
-            loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
+            if args.hugging_mae:
+                #inputs = image_processor(images=samples, return_tensors="pt")
+
+                outputs = model(samples)
+                loss = outputs.loss
+            else:
+                loss, _, _ = model(samples, mask_ratio=args.mask_ratio)
 
         loss_value = loss.item()
 
@@ -76,6 +88,21 @@ def train_one_epoch(model: torch.nn.Module,
             log_writer.add_scalar('train_loss', loss_value_reduce, epoch_1000x)
             log_writer.add_scalar('lr', lr, epoch_1000x)
 
+
+    if rnd_visual_samples is not None:
+        with torch.no_grad():
+            if args.hugging_mae:
+                #inputs = image_processor(images=rnd_visual_samples, return_tensors="pt")
+                outputs = model(rnd_visual_samples)
+                visual_outputs = outputs.logits
+            else:
+                loss, visual_outputs, masks = model(rnd_visual_samples, mask_ratio=args.mask_ratio)
+
+            visual_outputs = model.unpatchify(visual_outputs)
+            #visual_outputs = torch.einsum('bchw->bhwc', visual_outputs)
+            log_writer.add_image(f"Images_after_epoch_{epoch}", make_grid(visual_outputs), 0)
+            #log_writer.add_images(f"Images_after_epoch_{epoch}", visual_outputs, 0)
+            log_writer.close()
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

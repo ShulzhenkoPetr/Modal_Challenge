@@ -27,6 +27,8 @@ import timm
 assert timm.__version__ == "0.3.2"  # version check
 import timm.optim.optim_factory as optim_factory
 
+from transformers import ViTMAEForPreTraining, AutoImageProcessor
+
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
@@ -40,17 +42,24 @@ from torch.utils.data import Dataset
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, folder_path, transform=None):
-        self.files = sorted(glob.glob("%s/*.*" % folder_path))
+    def __init__(self, txt_path, transform=None, hugging_mae=False):
+        with open(txt_path, 'r') as f:
+            self.files = sorted(f.readlines())
+
         self.transform = transform
+        self.hugging_mae = hugging_mae
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
-        img = Image.open(img_path).convert('RGB')
+        img = Image.open(img_path.rstrip('\n')).convert('RGB')
 
-        # Apply transforms
         if self.transform:
-            img = self.transform(img)
+            if self.hugging_mae:
+                img = self.transform(images=img, return_tensors="pt")
+                img = img['pixel_values']
+                img = img.view(img.shape[1], img.shape[2], img.shape[3])
+            else:
+                img = self.transform(img)
 
         return img
 
@@ -108,6 +117,12 @@ def get_args_parser():
     parser.add_argument('--resume', default='',
                         help='resume from checkpoint')
 
+    parser.add_argument('--pretrained_encoder', default='',
+                        help='path to pretrained ViT encoder weights')
+    parser.add_argument('--hugging_mae', action='store_true',
+                        help='Hugging Face pretrained encoder-decoder model')
+
+
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--num_workers', default=10, type=int)
@@ -143,29 +158,33 @@ def main(args):
     cudnn.benchmark = True
 
     # simple augmentation
-    transform_train = transforms.Compose([
-        transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    dataset_train = OneImageFolder(os.path.join(args.data_path, 'unlabelled'), transform=transform_train)
-    print(dataset_train)
-
-    if True:  # args.distributed:
-        num_tasks = misc.get_world_size()
-        global_rank = misc.get_rank()
-        sampler_train = torch.utils.data.DistributedSampler(
-            dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
-        )
-        print("Sampler_train = %s" % str(sampler_train))
+    if args.hugging_mae:
+        image_processor = AutoImageProcessor.from_pretrained("facebook/vit-mae-base")
+        transform_train = image_processor
     else:
-        sampler_train = torch.utils.data.RandomSampler(dataset_train)
+        transform_train = transforms.Compose([
+            transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-    if global_rank == 0 and args.log_dir is not None:
-        os.makedirs(args.log_dir, exist_ok=True)
-        log_writer = SummaryWriter(log_dir=args.log_dir)
+    dataset_train = OneImageFolder(
+                            args.data_path,
+                            transform=transform_train,
+                            hugging_mae=args.hugging_mae
+    )
+    print(len(dataset_train))
+
+    sampler_train = torch.utils.data.RandomSampler(dataset_train)
+
+    if args.log_dir is not None:
+        log_dir = os.path.join(
+            args.log_dir,
+            args.model,
+            datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S"))
+        logger = SummaryWriter(log_dir)
     else:
-        log_writer = None
+        logger = None
 
     data_loader_train = torch.utils.data.DataLoader(
         dataset_train, sampler=sampler_train,
@@ -176,14 +195,18 @@ def main(args):
     )
 
     # define the model
-    model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
+    if args.hugging_mae:
+        model = ViTMAEForPreTraining.from_pretrained('facebook/vit-mae-base')
+    else:
+        model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
     model.to(device)
+    #
+    # model_without_ddp = model
+    print("Model = %s" % str(model))
 
-    model_without_ddp = model
-    print("Model = %s" % str(model_without_ddp))
-
-    eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
+    # eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
+    eff_batch_size = args.batch_size * args.accum_iter * 1
 
     if args.lr is None:  # only base_lr is specified
         args.lr = args.blr * eff_batch_size / 256
@@ -194,40 +217,82 @@ def main(args):
     print("accumulate grad iterations: %d" % args.accum_iter)
     print("effective batch size: %d" % eff_batch_size)
 
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
-        model_without_ddp = model.module
+    # if args.distributed:
+    #     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
+    #     model_without_ddp = model.module
 
     # following timm: set wd as 0 for bias and norm layers
-    param_groups = optim_factory.add_weight_decay(model_without_ddp, args.weight_decay)
+    param_groups = optim_factory.add_weight_decay(model, args.weight_decay)
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     print(optimizer)
     loss_scaler = NativeScaler()
 
-    misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
+
+    #Load model:
+    #load weights from checkpoint
+    if args.resume:
+        misc.load_model(args=args, model_without_ddp=model, optimizer=optimizer, loss_scaler=loss_scaler)
+
+    # Unfreeze encoder layers ..
+
+    #Load pretrained frozen encoder
+    if args.pretrained_encoder:
+        encoder_weights = torch.load(args.pretrained_encoder, map_location='cpu')
+        encoder_layers = list(encoder_weights['model'].keys())
+
+        sd = model.state_dict()
+
+        with torch.no_grad():
+            for layer in sd:
+                if layer in encoder_layers:
+                    sd[layer].data = encoder_weights['model'][layer].data
+
+        model.load_state_dict(sd)
+
+        #Freeze encoder layers
+        mae_layers = list(model.state_dict().keys())
+        for i, param in enumerate(model.parameters()):
+            if mae_layers[i] in encoder_layers:
+                param.requires_grad_(False)
+
+    model.to(device)
+
+    #Training loop:
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
-        if args.distributed:
-            data_loader_train.sampler.set_epoch(epoch)
+
+        # if args.hugging_mae:
+        #     rnd_visual_samples = image_processor(
+        #         images=[dataset_train[10], dataset_train[1000], dataset_train[10000]],
+        #         return_tensors="pt"
+        #     )
+        # else:
+
+        rnd_visual_samples = torch.stack((dataset_train[10], dataset_train[1000], dataset_train[10000])).to(device)
+
+        #rnd_visual_samples = None
+
         train_stats = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
-            log_writer=log_writer,
-            args=args
+            log_writer=logger,
+            args=args,
+            #image_processor=image_processor,
+            rnd_visual_samples=rnd_visual_samples
         )
-        if args.output_dir and (epoch % 20 == 0 or epoch + 1 == args.epochs):
+        if args.output_dir:
             misc.save_model(
-                args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
+                args=args, model=model, model_without_ddp=model, optimizer=optimizer,
                 loss_scaler=loss_scaler, epoch=epoch)
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      'epoch': epoch, }
 
         if args.output_dir and misc.is_main_process():
-            if log_writer is not None:
-                log_writer.flush()
+            if logger is not None:
+                logger.flush()
             with open(os.path.join(args.output_dir, "log.txt"), mode="a", encoding="utf-8") as f:
                 f.write(json.dumps(log_stats) + "\n")
 
