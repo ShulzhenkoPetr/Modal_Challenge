@@ -170,7 +170,7 @@ def get_args_parser():
 
 
 class OneImageFolder(Dataset):
-    def __init__(self, txt_path, is_train, transform=None, hugging_mae=False):
+    def __init__(self, txt_path, is_train=False, is_custom=False, transform=None, hugging_mae=False):
         with open(txt_path, 'r') as f:
             self.files = sorted(f.readlines())
 
@@ -180,6 +180,7 @@ class OneImageFolder(Dataset):
         self.is_Train = is_train
         self.transform = transform
         self.hugging_mae = hugging_mae
+        self.is_custom = is_custom
 
 
     def __getitem__(self, index):
@@ -189,7 +190,7 @@ class OneImageFolder(Dataset):
         label = self.labels_dict[label_str]
 
         if self.transform:
-            if self.hugging_mae and self.is_Train:
+            if self.hugging_mae and self.is_Train and not self.is_custom:
                 img = self.transform(images=img, return_tensors="pt")
                 img = img['pixel_values']
                 img = img.view(img.shape[1], img.shape[2], img.shape[3])
@@ -217,7 +218,7 @@ class RandomBlocks(torch.nn.Module):
         blocked_img = torch.clone(img_tensor)
         for k in range(self.n_k):
             y, x = np.random.randint(0, img_size - h, 2)
-            blocked_img[:, :, y:y + h, x:x + w] = 0
+            blocked_img[:, y:y + h, x:x + w] = 0
 
         return blocked_img
 
@@ -270,7 +271,8 @@ def main(args):
 
     dataset_train = OneImageFolder(
         args.data_path_train,
-        True,
+        is_train=True,
+        is_custom=args.custom_preprocess,
         transform=transform_train,
         hugging_mae=args.hugging_mae
     )
@@ -278,7 +280,8 @@ def main(args):
 
     dataset_val = OneImageFolder(
         args.data_path_val,
-        False,
+        is_train=False,
+        is_custom=False,
         transform=transform_val,
         hugging_mae=args.hugging_mae
     )
