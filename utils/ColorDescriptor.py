@@ -1,5 +1,5 @@
 import numpy as np
-import cv2
+import torch
 import imutils
 
 
@@ -9,11 +9,10 @@ class ColorDescriptor:
 
     def describe(self, image):
         # convert the image to the HSV color space
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         features = []
 
         # grab the dimensions and compute the center of the image
-        (h, w) = image.shape[:2]
+        (h, w) = image.shape[-2:]
         (cX, cY) = (int(w * 0.5), int(h * 0.5))
 
         # top-left, top-right, bottom-right, bottom-left corner
@@ -52,3 +51,15 @@ class ColorDescriptor:
 
         # return the histogram
         return hist
+
+
+if __name__ == '__main__':
+    from Dataset import show_tensor_images, ModalDataset
+
+    path = '/Users/sanek_tarasov/Documents/École polytechnique/2A/P3/Modal'
+    train_dataset = ModalDataset('train', path)
+    descriptor = ColorDescriptor(1e3)
+
+    # print(descriptor.describe(train_dataset[0]))
+    torch.histogram(torch.tensor([1., 2, 1]), bins=4, range=(0., 3.), weight=torch.tensor([1., 2., 4.]))
+
