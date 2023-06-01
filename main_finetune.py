@@ -28,6 +28,7 @@ from timm.models.layers import trunc_normal_
 from timm.data.mixup import Mixup
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 import timm.optim.optim_factory as optim_factory
+from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 import util.lr_decay as lrd
 import util.misc as misc
@@ -163,6 +164,7 @@ def get_args_parser():
                         help='url used to set up distributed training')
 
     parser.add_argument('--hugging_mae', action='store_true')
+    parser.add_argument('--custom_preprocess', action='store_true')
 
     return parser
 
@@ -199,7 +201,29 @@ class OneImageFolder(Dataset):
     def __len__(self):
         return len(self.files)
 
+class RandomBlocks(torch.nn.Module):
+    """
+    Function from utils.Preprocessing.py as a transforms object
+    """
+    def __init__(self, n_k=10, size=32):
+        super().__init__()
+        self.n_k = n_k
+        self.size = size
 
+    def forward(self, img_tensor):
+        h, w = self.size, self.size
+        img_size = img_tensor.shape[2]
+
+        blocked_img = torch.clone(img_tensor)
+        for k in range(self.n_k):
+            y, x = np.random.randint(0, img_size - h, 2)
+            blocked_img[:, :, y:y + h, x:x + w] = 0
+
+        return blocked_img
+
+    def __repr__(self) -> str:
+        detail = f"(n_k={self.n_k}), (size={self.size})"
+        return f"{self.__class__.__name__}{detail}"
 
 def main(args):
     misc.init_distributed_mode(args)
@@ -217,12 +241,32 @@ def main(args):
     cudnn.benchmark = True
 
     #Create datasets
-    if args.hugging_mae:
+    if args.hugging_mae and not args.custom_preprocess:
         transform_train = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
+    elif args.custom_preprocess:
+        transform_train = transforms.Compose(
+            [
+                transforms.Resize(args.input_size,
+                                  antialias=True,
+                                  interpolation=Image.BICUBIC,),
+                transforms.ToTensor(),
+                transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
+                transforms.ColorJitter(0.4),
+                RandomBlocks(n_k=10, size=32)
+            ]
+        )
     else:
         transform_train = build_transform(True, args)
-    transform_val = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Resize(args.input_size, antialias=True)])
+
+    transform_val = transforms.Compose(
+        [
+            transforms.Resize(args.input_size,
+                              interpolation=Image.BICUBIC,
+                              antialias=True),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)
+        ]
+    )
 
     dataset_train = OneImageFolder(
         args.data_path_train,

@@ -77,7 +77,9 @@ def main(args):
     model.to(device)
 
     confident_names = []
-    submission = pd.DataFrame(columns=["id", "label"])
+    # submission = pd.DataFrame(columns=["id", "label"])
+
+    softmax = torch.nn.Softmax(dim=1)
 
     with torch.no_grad():
 
@@ -92,25 +94,26 @@ def main(args):
                 output = model(images)
                 output_logits = output.logits
 
-            label_digits = output_logits.argmax(dim=1)
+            # label_digits = output_logits.argmax(dim=1)
 
-            predictions = [digit_class_names_dict[pred] for pred in label_digits.cpu().numpy()]
+            # predictions = [digit_class_names_dict[pred] for pred in label_digits.cpu().numpy()]
 
-            submission = pd.concat(
-                [
-                    submission,
-                    pd.DataFrame({"id": names, "label": predictions}),
-                ]
-            )
+            # submission = pd.concat(
+            #     [
+            #         submission,
+            #         pd.DataFrame({"id": names, "label": predictions}),
+            #     ]
+            # )
 
             # Sort samples with strong confidence
             names = np.array(names)
+            output_logits = softmax(output_logits)
             confidence = output_logits.max(dim=1).values.cpu().numpy()
             high_confidence_names = names[confidence > 0.7]
 
             confident_names.extend(high_confidence_names)
 
-    submission.to_csv(args.output_dir + '/submission.csv', index=False)
+    # submission.to_csv(args.output_dir + '/submission.csv', index=False)
 
     with open(args.output_dir + '/high_confidence_names.txt', 'w') as f:
         f.write("".join(confident_names))
