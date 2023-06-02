@@ -1,11 +1,14 @@
 import argparse
 import datetime
+import os
 import json
 import csv
 import numpy as np
 import pandas as pd
 
 from transformers import ViTMAEModel, AutoImageProcessor, ViTForImageClassification
+
+from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 import torch
 from torch.utils.data import Dataset
@@ -30,7 +33,11 @@ class OneImageFolder(Dataset):
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         img = Image.open(img_path.rstrip('\n')).convert('RGB')
-        img_name = img_path.replace('/content/unlabelled/', '')
+
+        img_name = os.path.splitext(img_path)[0].replace(
+            '../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/test/', '')
+
+        # img_name = img_path.replace('../gdrive/MyDrive/Modal_Challendge_dataset/compressed_dataset/test/', '')
 
         if self.transform:
             img = self.transform(img)
@@ -44,8 +51,11 @@ class OneImageFolder(Dataset):
 def main(args):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    test_transforms = transforms.Compose([transforms.ToTensor(),
-                                          transforms.Resize(args.input_size, antialias=True)])
+    test_transforms = transforms.Compose([
+        transforms.Resize(args.input_size, antialias=True),
+        transforms.ToTensor(),
+        transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)
+    ])
 
     dataset_test = OneImageFolder(
         args.data_path_test,
@@ -77,7 +87,7 @@ def main(args):
     model.to(device)
 
     confident_names = []
-    # submission = pd.DataFrame(columns=["id", "label"])
+    submission = pd.DataFrame(columns=["id", "label"])
 
     softmax = torch.nn.Softmax(dim=1)
 
@@ -94,29 +104,29 @@ def main(args):
                 output = model(images)
                 output_logits = output.logits
 
-            # label_digits = output_logits.argmax(dim=1)
+            label_digits = output_logits.argmax(dim=1)
 
-            # predictions = [digit_class_names_dict[pred] for pred in label_digits.cpu().numpy()]
+            predictions = [digit_class_names_dict[pred] for pred in label_digits.cpu().numpy()]
 
-            # submission = pd.concat(
-            #     [
-            #         submission,
-            #         pd.DataFrame({"id": names, "label": predictions}),
-            #     ]
-            # )
+            submission = pd.concat(
+                [
+                    submission,
+                    pd.DataFrame({"id": names, "label": predictions}),
+                ]
+            )
 
             # Sort samples with strong confidence
-            names = np.array(names)
-            output_logits = softmax(output_logits)
-            confidence = output_logits.max(dim=1).values.cpu().numpy()
-            high_confidence_names = names[confidence > 0.7]
+            # names = np.array(names)
+            # output_logits = softmax(output_logits)
+            # confidence = output_logits.max(dim=1).values.cpu().numpy()
+            # high_confidence_names = names[confidence > 0.7]
 
-            confident_names.extend(high_confidence_names)
+            # confident_names.extend(high_confidence_names)
 
-    # submission.to_csv(args.output_dir + '/submission.csv', index=False)
+    submission.to_csv(args.output_dir + '/submission.csv', index=False)
 
-    with open(args.output_dir + '/high_confidence_names.txt', 'w') as f:
-        f.write("".join(confident_names))
+    # with open(args.output_dir + '/high_confidence_names.txt', 'w') as f:
+    #     f.write("".join(confident_names))
 
 
 if __name__ == '__main__':

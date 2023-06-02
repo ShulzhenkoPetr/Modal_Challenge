@@ -22,7 +22,7 @@ def train_val_div():
         f.writelines(vals)
 
 def imagenet_div():
-    with open('high_confidence_names.txt', 'r') as f:
+    with open('high_confidence_names_0.3.txt', 'r') as f:
         names = f.readlines()
 
     with open('unlabelled_imgs_content.txt', 'r') as f:
